@@ -1,0 +1,23 @@
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Startseite</title>
+</head>
+{% extends "base.html" %}
+{% block title %}Index{% endblock %}
+
+{% block content %}
+    <h1>Willkommen</h1>
+
+    <form action="/login/" method="post">
+        {{ form.non_field_errors }}
+    <p><label for="id_name">Name:</label>
+        <input id="id_name" type="text" name="subject" maxlength="100" /></p>
+    <p><label for="id_passwd">Passwd:</label>
+        <input type="text" name="message" id="id_passwd" /></p>
+
+    <input type="submit" value="Submit" />
+    </form>
+
+{% endblock %}
+
+</html>

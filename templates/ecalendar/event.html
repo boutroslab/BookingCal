@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Kalendar{% endblock %}
+
+{% block content %}
+
+      <style type="text/css">
+
+        .entry { border: 3px solid #eee; padding: 10px; width: 560px; margin: 9px; clear:both;}
+
+        #inp1 { text-align: left; width: 550px; }
+        #inp1 td{ min-width:150px; font-size:15px;}
+        h2 { text-align: left; margin-left: 50px; font-size:22px;}
+    </style>
+
+    {% if entries %}
+    <h2> {{ entries.title }}</h2>
+        <div class="entry">
+            <div id="inp1">
+            <table>
+                <tr>
+                    <td><b>Titel:</b> </td>
+                    <td>{{ entries.title }}    </td>
+                </tr>
+                <tr>
+                    <td><b>Equipment:</b></td>
+                    <td>{{ entries.equipment.name }}</td>
+                </tr>
+                <tr>
+                    <td><b>Start Date:</b></td>
+                    <td>{{ entries.date}} </td>
+                </tr>
+                <tr>
+                    <td><b>End Date:</b></td>
+                    <td>{{ entries.enddate }}</td>
+                </tr>
+                <tr>
+                    <td><b>Creator:</b></td>
+                    <td>{{ entries.creator }}</td>
+                </tr>
+                <tr>
+                    <td><b>Information:</b></td>
+                    <td>{{ entries.body }}</td>
+                </tr>
+
+            </table>
+
+        </div>
+    {% else %}
+        No Event selected
+    {%  endif %}
+{% endblock %}

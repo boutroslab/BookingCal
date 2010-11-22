@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Kalendar{% endblock %}
+
+{% block content %}
+        <style type="text/css">
+            h1{  margin-left:270px;}
+            .tab {margin:30px;}
+            .month { width: 80px; float: left;margin: 2px; padding: 3px;
+                    border:2px ridge #000000; -moz-border-radius:5px; padding:5px; text-decoration:none; color:#000000;}
+             .month:hover{ border-style:solid; }
+            .month a { text-decoration: none; margin: 4px; color:#000000;}
+            .month a:visited {text-decoration: none; margin: 4px; color:#000000; }
+            .clear { clear: both; }
+            .current {width: 80px; float: left; margin: 2px; padding: 3px; background: #eeeec8;
+                    border:2px ridge #000000; -moz-border-radius:5px; padding:5px; text-decoration:none; color:#000000; font-weight:bolder;}
+            .current a { text-decoration: none; margin: 4px; color:#000000; }
+            .current a:visited {text-decoration: none; margin: 4px; color:#000000; }
+            .current:hover{ border-style:solid; }
+        </style>
+       <div class="tab">
+
+
+
+    {% for year, months in years %}
+        <div class="clear"></div>
+        <h1>{{ year }}</h1>
+        {% for month in months %}
+        <div class=
+        {% if month.current %}"current"{% endif %}
+        {% if not month.current %}"month"{% endif %} >
+            {% if month.entry %}<b>{% endif %}
+                    <a href="{% url ecalendar.views.month year month.n %}">{{ month.name }}</a>
+            {% if month.entry %}</b>{% endif %}
+         </div>
+        {% if month.n == 6 %}<br/><br /><br />{% endif %}
+        {% endfor %}
+    {% endfor %}
+    </div>
+{% endblock %}
+

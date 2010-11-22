@@ -1,0 +1,20 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+       <div class="menu">
+    <a href="/">{% trans 'Home' %}</a>
+    <a href="/kalendar">Calendar</a>
+    <a href="../">{% trans 'Log in' %}</a>
+   </div>
+{% endblock %}
+
+{% block content %}
+
+<p>{% trans "Thanks for spending some quality time with the Web site today." %}</p>
+
+
+
+<p><a href="../">{% trans 'Log in again' %}</a></p>
+
+{% endblock %}

@@ -1,0 +1,164 @@
+/*
+    DJANGO Admin styles
+*/
+
+body {
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    font-family: "Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
+    color: #333;
+    background: #fff;
+}
+
+/* LINKS */
+
+a:link, a:visited {
+    color: #5b80b2;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #036;
+}
+
+a img {
+    border: none;
+}
+
+a.section:link, a.section:visited {
+    color: white;
+    text-decoration: none;
+}
+
+/* GLOBAL DEFAULTS */
+
+
+h1,h2,h3,h4,h5 {
+    font-weight: bold;
+}
+
+h1 {
+    font-size: 18px;
+    color: #666;
+    padding: 0 6px 0 0;
+    margin: 0 0 .2em 0;
+
+}
+
+
+
+
+/* TEXT STYLES & MODIFIERS */
+
+p img, h1 img, h2 img, h3 img, h4 img, td img {
+    vertical-align: middle;
+}
+
+.clear {
+    clear: both;
+}
+
+
+/* TABLES */
+
+table {
+    border-collapse: collapse;
+    border-color: #ccc;
+}
+
+/* SORTABLE TABLES */
+
+thead th a:link, thead th a:visited {
+    color: #666;
+    display: block;
+}
+
+table thead th.sorted {
+    background-position: bottom left !important;
+}
+
+table thead th.sorted a {
+    padding-right: 13px;
+}
+
+table thead th.ascending a {
+    background: url(../img/admin/arrow-down.gif) right .4em no-repeat;
+}
+
+table thead th.descending a {
+    background: url(../img/admin/arrow-up.gif) right .4em no-repeat;
+}
+
+
+
+
+/* PAGE STRUCTURE */
+
+#container {
+    position: relative;
+    width: 100%;
+    min-width: 760px;
+    padding: 0;
+}
+
+#content {
+    margin: 10px 15px;
+}
+
+#header {
+    width: 100%;
+}
+
+
+#footer {
+    clear: both;
+    padding: 10px;
+}
+
+
+/* HEADER */
+
+#header {
+    background: #417690;
+    color: #ffc;
+    overflow: hidden;
+}
+
+#header h1{
+    font-weight:normal;
+    color: #f4f379;
+    margin: 8px 10px;
+}
+#header a:link, #header a:visited {
+    color: #ffc;
+}
+
+#header a:hover {
+    text-decoration: underline;
+}
+
+
+.menu {
+    background: #eee url(../../admin/img/admin/nav-bg.gif) bottom left repeat-x;
+    padding-left:20px;
+    font-size: 16px;
+    font-weight: normal;
+    cloat:left;
+}
+.menu li{
+    color: #666666;
+    float:left;
+    list-style: none;
+}
+.menu a:active,.menu a:visited, .menu a{
+    margin-right: 10px;
+    color: #666666;
+    font-style: normal;
+    font-variant: normal;
+    text-decoration: none;
+    text-transform: capitalize;
+}
+.menu a:hover{
+    font-weight: bolder;
+}

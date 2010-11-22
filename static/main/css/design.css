@@ -1,0 +1,91 @@
+root {
+    display: block;
+}
+body{
+    background-color: #cccccc;
+    font-family: 'Courier New',Courier,monospace;
+    font-size: 14px;
+    color: #000000;
+    margin-right: 5px;
+    margin-left: 5px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+#main{
+          margin: auto;
+}
+#menu {
+    width: 900px;
+    float: left;
+}
+#menu li{
+    margin-right: 20px;
+    float:left;
+    list-style: none;
+}
+#menu a:active,#menu a:visited, #menu a{
+    color:  #003333;
+    font-style: normal;
+    font-variant: normal;
+    text-decoration: none;
+    text-transform: capitalize;
+}
+#menu a:hover{
+    color:  #003333;
+    font-weight: bolder;
+}
+
+.content{
+     -moz-border-radius:10px;
+    -khtml-border-radius:30px;
+    width: 900px;
+    background-color: #ccffcc;
+    padding:20px;
+    float:left;
+    clear:both;
+    margin-left: 20px;
+}
+.content h1{
+    font-family:"DejaVu Sans";
+    font-variant:normal;
+    text-transform: capitalize;
+    font-size: 18px;
+    text-align: center;
+}
+.contList{
+    text-align: left;
+    text-decoration: none;
+}
+.contList a:active,.contList a:visited,.contList a{
+      text-decoration: none;
+      text-transform: capitalize;
+}
+.contList a:hover{
+    text-transform: uppercase;
+    font-weight: bold;
+}
+.eventT{
+    background-color: #cccccc;
+    border: 1px #ffffff dashed;
+}
+.eventT thead{
+    background-color: #ccffcc;
+    font-weight:bolder;
+}
+.eventT td{
+    text-align:center;
+    padding:10px;
+}
+
+.depT{
+    background-color: #cccccc;
+    border: 1px #ffffff dashed;
+}
+.depT thead{
+    background-color: #ccffcc;
+    font-weight:bolder;
+}
+.depT td{
+    text-align:center;
+    padding:10px;
+}
