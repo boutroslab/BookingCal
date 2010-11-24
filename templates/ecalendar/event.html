@@ -4,6 +4,24 @@
 
 {% block content %}
 
+
+   <script type="text/javascript">
+          function equipmentview(){
+
+              var div1 = document.getElementById('equip')
+              var div2 = document.getElementById('equipt')
+                  if (div1.style.display == 'none') {
+                      div1.style.display = 'block'
+                      div2.title="Click to hide equipment informations"
+                  } else {
+                      div1.style.display = 'none'
+                      div2.title="Click to view equipment informations"
+                  }
+          }
+
+
+    </script>
+
       <style type="text/css">
 
         .entry { border: 3px solid #eee; padding: 10px; width: 560px; margin: 9px; clear:both;}
@@ -11,18 +29,33 @@
         #inp1 { text-align: left; width: 550px; }
         #inp1 td{ min-width:150px; font-size:15px;}
         h2 { text-align: left; margin-left: 50px; font-size:22px;}
+        .back {  border:2px ridge #000000; -moz-border-radius:5px; padding:5px; text-decoration:none; color:#000000; font-weight:bolder; }
+        .back:hover{ border-style:solid; }
+        #equip{
+            display:none;
+            margin-left:20px;
+        }
+        #equip h2{ text-align: left; margin-left: 70px; font-size:22px; }
+        #equipInnen{
+            border: 3px solid #eee; padding: 10px; width: 560px; margin: 9px; clear:both; min-width:150px; font-size:15px;
+            display:block;
+        }
+        #equipInnen td{ min-width:150px; font-size:15px;}
+      #equipt{
+          cursor: pointer;
+      }
+
     </style>
+    <br />
+
+    <a class="back" href="javascript:history.back()" > &lt;&lt; back </a>
 
     {% if entries %}
     <h2> {{ entries.title }}</h2>
         <div class="entry">
-            <div id="inp1">
+            <div id="inp1" >
             <table>
-                <tr>
-                    <td><b>Titel:</b> </td>
-                    <td>{{ entries.title }}    </td>
-                </tr>
-                <tr>
+                <tr onclick="equipmentview()" id="equipt" title="Click to view equipment informations" cursor:crosshair;>
                     <td><b>Equipment:</b></td>
                     <td>{{ entries.equipment.name }}</td>
                 </tr>
@@ -44,7 +77,27 @@
                 </tr>
 
             </table>
+        </div>
+        </div>
+        <div  id="equip">
+            <h2>{{ entries.equipment.name }} </h2>
+            <div id="equipInnen">
 
+                <table>
+                             <tr>
+                                <td><b>Room:</b></td>
+                                <td>{{ entries.equipment.room }}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Person:</b></td>
+                                <td>{{ entries.equipment.person }}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Description:</b></td>
+                                <td>{{ entries.equipment.desc }}</td>
+                            </tr>
+                </table>
+            </div>
         </div>
     {% else %}
         No Event selected

@@ -2,6 +2,12 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib import admin
 from _ast import Eq
+from django.forms.models import ModelForm
+from django.contrib.contenttypes.models import ContentType
+from django.http import HttpResponseRedirect
+from datetime import datetime
+from django.shortcuts import render_to_response
+from django.core.urlresolvers import reverse
 
 
 class Equipment(models.Model):
@@ -12,11 +18,11 @@ class Equipment(models.Model):
     desc =  models.CharField(max_length=200)
 
 class Entry(models.Model):
-    equipment = models.ForeignKey(Equipment , blank=False, null=False)
+    equipment = models.ForeignKey(Equipment , blank=False, null=False )
     title = models.CharField(max_length=40)
     body = models.TextField(max_length=10000, blank=True, verbose_name="Extra Information")
     created = models.DateTimeField(auto_now_add=True)
-    date = models.DateTimeField(blank=False)
+    date = models.DateTimeField(blank=False,default=datetime.now)
     enddate = models.DateTimeField(blank=False)
     creator = models.ForeignKey(User,blank=True)
     remind = models.BooleanField(default=False)
@@ -59,9 +65,35 @@ class Entry(models.Model):
     class Meta:
         verbose_name_plural="entries"
 
+
+def copy_entry(modeladmin, request, queryset):
+    for obj in queryset:
+
+        ct = ContentType.objects.get_for_model(queryset.model)
+        dateStart= obj.date
+        date_date = dateStart.date()
+        date_time = dateStart.time()
+        date_end = datetime.combine(date_date,date_time)
+        print date_end
+
+        return HttpResponseRedirect("add/?equipment=%(equip)s&title=%(title)s&enddate=%(Edate)s" % {
+        "equip":ct.pk,
+        "title":obj.title,
+        "Edate": datetime.now(),
+        })
+
+copy_entry.short_description = "Copy one Entry"
+
+
+
+
+
   ##Admin
 class EntryAdmin(admin.ModelAdmin):
+    admin.site.disable_action('delete_selected')
 
+
+    actions = [copy_entry]
 
     raw_id_fields = ("equipment",)
     fieldsets = [
@@ -76,6 +108,7 @@ class EntryAdmin(admin.ModelAdmin):
 
     ordering = ['date']
     list_per_page = 20
+
 
     def save_model(self, request, obj, form, change):
         instance = form.save(commit=False)
@@ -106,6 +139,7 @@ class EntryAdmin(admin.ModelAdmin):
 admin.site.register(Entry, EntryAdmin)
 
 class EquipmentAdmin(admin.ModelAdmin):
+
         list_display = ["name", "enabled", "room", "person", "desc"]
         list_filter =["enabled"]
         list_per_page = 20

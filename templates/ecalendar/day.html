@@ -8,14 +8,14 @@
 
         h2 { text-align: left; margin-left: 50px; font-size:22px; }
 
-        .inp1 {font-size:15px; width: 300px; float:left; border:2px ridge #cccccc; padding:10px; -moz-border-radius:5px;}
+        .inp1 { cursor: pointer;font-size:15px; width: 300px; float:left; border:2px ridge #cccccc; padding:10px; -moz-border-radius:5px;}
         .inp1:hover{ border-style:solid; }
         .inp1 a:visited{ text-decoration:none;}
         .inp1 a{text-decoration:none; color:#000000;}
         .inp1 a:hover{ text-decoration:none; font-weight:bold;}
         .inp1 td{padding:5px;}
 
-        .inp2 { width:400px; font-size:15px; width: 300px; float:left; border:2px ridge #cccccc; padding:10px; -moz-border-radius:5px;}
+        .inp2 {cursor: pointer; width:400px; font-size:15px; width: 300px; float:left; border:2px ridge #cccccc; padding:10px; -moz-border-radius:5px;}
         .inp2:hover{ border-style:solid; }
         .inp2 a:visited{ text-decoration:none;}
         .inp2 a{text-decoration:none; color:#000000;}
@@ -29,7 +29,7 @@
 
        <div id="mainly">
                                          <br/>
-      <a class="back" href="{% url ecalendar.views.month year month %}"> &lt;&lt; back to month </a>
+      <a class="back" href="{% url ecalendar.views.month year month %}" > &lt;&lt; back to month </a>
 
     <h2> {{ day }}.{{ month }}.{{ year }}</h2>
 
@@ -37,7 +37,8 @@
 
     {% for entry in entries %}
 
-      <div class="{% cycle 'inp1' 'inp2' %}" onClick="parent.location='{% url ecalendar.views.event entry.id %}'" >
+      <div class="{% cycle 'inp1' 'inp2' %}" onClick="parent.location='{% url ecalendar.views.event entry.id %}'"
+            title='Click to view this booking'>
                  <table>
                     <tr>
                         <td><b>Titel:</b> </td>
@@ -46,6 +47,10 @@
                     <tr>
                         <td><b>Equipment:</b></td>
                         <td>{{ entry.equipment.name }}</td>
+                    </tr>
+                    <tr>
+                        <td><b>Creator:</b></td>
+                        <td>{{ entry.creator }}</td>
                     </tr>
                 </table>
             </div>
