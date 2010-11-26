@@ -1,4 +1,6 @@
 # Django settings for helloWorld project.
+from django_auth_ldap.config import LDAPSearch  , GroupOfNamesType
+
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -173,3 +175,17 @@ INSTALLED_APPS = (
 #    'django.contrib.auth.contrib.ldap.backend.LDAPBackend',
 #    'django.contrib.auth.backends.ModelBackend',
 #)
+
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.contrib.ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+
+# Baseline configuration.
+AUTH_LDAP_SERVER_URI = "ad.dkfz-heidelberg.de"
+AUTH_LDAP_BIND_DN = "OU=dkfz,DC=ad,DC=dkfz-heidelberg,DC=de"
+AUTH_LDAP_BIND_PASSWORD = "logalvsa"
+AUTH_LDAP_USER_SEARCH = LDAPSearch("ou=users,dc=example,dc=com",ldap.SCOPE_SUBTREE, "(uid=%(user)s)") # or perhaps:
+

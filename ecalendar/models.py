@@ -76,14 +76,26 @@ def copy_entry(modeladmin, request, queryset):
         date_end = datetime.combine(date_date,date_time)
         print date_end
 
-        return HttpResponseRedirect("add/?equipment=%(equip)s&title=%(title)s&enddate=%(Edate)s" % {
+#        return HttpResponseRedirect("add/?equipment=%(equip)s&title=%(title)s&enddate=%(Edate)s" % {
+        return HttpResponseRedirect("add/?equipment=%(equip)s&title=%(title)s" % {
         "equip":ct.pk,
         "title":obj.title,
-        "Edate": datetime.now(),
+#        "Edate": datetime.now(),
         })
 
 copy_entry.short_description = "Copy one Entry"
 
+def copy_entry_by_title_and_equipment(modeladmin, request, queryset):
+    for obj in queryset:
+
+        ct = ContentType.objects.get_for_model(queryset.model)
+
+        return HttpResponseRedirect("add/?equipment=%(equip)s&title=%(title)s" % {
+        "equip":ct.pk,
+        "title":obj.title,
+        })
+
+copy_entry_by_title_and_equipment.short_description = "Copy one Entry with the title and the Equipment"
 
 
 
@@ -93,7 +105,7 @@ class EntryAdmin(admin.ModelAdmin):
     admin.site.disable_action('delete_selected')
 
 
-    actions = [copy_entry]
+    actions = [copy_entry, copy_entry_by_title_and_equipment]
 
     raw_id_fields = ("equipment",)
     fieldsets = [
