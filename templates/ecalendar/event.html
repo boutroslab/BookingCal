@@ -3,8 +3,6 @@
 {% block title %}Kalendar{% endblock %}
 
 {% block content %}
-
-
    <script type="text/javascript">
           function equipmentview(){
 
@@ -55,9 +53,9 @@
         <div class="entry">
             <div id="inp1" >
             <table>
-                <tr onclick="equipmentview()" id="equipt" title="Click to view equipment informations" cursor:crosshair;>
+                <tr id="equipt" title="Click to view equipment informations">
                     <td><b>Equipment:</b></td>
-                    <td>{{ entries.equipment.name }}</td>
+                    <td  onClick="equipmentview()" style="cursor:pointer">{{ entries.equipment.name }}</td>
                 </tr>
                 <tr>
                     <td><b>Start Date:</b></td>

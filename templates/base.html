@@ -10,14 +10,15 @@
     <body>
         <div id="container">
             <div id="header">
-           <h1 >B110 Booking Software</h1>
+                <h1 >B110 Booking Software</h1>
             </div>
 
             <div class="menu">
-                    <a href="/">Home </a>
-                    <a href="/kalendar">Calendar</a>
-                    <a href="/admin">Log In</a>
-
+                <a href="/">Home </a>
+                <a href="/kalendar">Calendar</a>
+               
+                <a href="/kalendar/new">Add Entry</a>
+{% block menu %} {% endblock %}
             </div>
             <div id="content">
                 {% block content %}{% endblock %}

@@ -31,39 +31,39 @@ class Entry(models.Model):
         return self.equipment.name
     equipment_name.admin_order_field = 'equipment__name'
 
-    def save(self, **kwargs):
-#        if self.creator:
-#          return self.creator
-#        else :
-#           return self.creator == request.user
-
-        checknumber =0
-        for e in Entry.objects.raw('SELECT * FROM ecalendar_entry'):
-            if self.equipment.id == e.equipment_id:
-                if self.enddate >= e.date and self.enddate <=e.enddate:
-                        checknumber +=1
-                elif self.date >=e.date and self.date <=e.enddate:
-                         checknumber +=1
-                elif self.date<=e.date and self.enddate>=e.enddate:
-                     checknumber +=1
-        for equipm in Equipment.objects.raw('SELECT * FROM ecalendar_equipment'):
-            if equipm.id == self.equipment.id:
-                if equipm.enabled==False:
-                    checknumber +=1
-
-
-        if checknumber>0:
-            error_messages='Not available'
-            return error_messages
-        else:
-            super(Entry, self).save(**kwargs)
-
-                # Call the "real" save() method.
-
-
-
-    class Meta:
-        verbose_name_plural="entries"
+#    def save(self, **kwargs):
+##        if self.creator:
+##          return self.creator
+##        else :
+##           return self.creator == request.user
+#
+#        checknumber =0
+#        for e in Entry.objects.raw('SELECT * FROM ecalendar_entry'):
+#            if self.equipment.id == e.equipment_id:
+#                if self.enddate >= e.date and self.enddate <=e.enddate:
+#                        checknumber +=1
+#                elif self.date >=e.date and self.date <=e.enddate:
+#                         checknumber +=1
+#                elif self.date<=e.date and self.enddate>=e.enddate:
+#                     checknumber +=1
+#        for equipm in Equipment.objects.raw('SELECT * FROM ecalendar_equipment'):
+#            if equipm.id == self.equipment.id:
+#                if equipm.enabled==False:
+#                    checknumber +=1
+#
+#
+#        if checknumber>0:
+#            error_messages='Not available'
+#            return error_messages
+#        else:
+#            super(Entry, self).save(**kwargs)
+#
+#                # Call the "real" save() method.
+#
+#
+#
+#    class Meta:
+#        verbose_name_plural="entries"
 
 
 def copy_entry(modeladmin, request, queryset):

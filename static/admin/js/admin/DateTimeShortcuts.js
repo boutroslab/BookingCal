@@ -18,11 +18,9 @@ var DateTimeShortcuts = {
         // set in the admin/base.html template, so if it's not there, someone's
         // overridden the template. In that case, we'll set a clearly-invalid
         // value in the hopes that someone will examine HTTP requests and see it.
-        if (window.__admin_media_prefix__ != undefined) {
-            DateTimeShortcuts.admin_media_prefix = window.__admin_media_prefix__;
-        } else {
-            DateTimeShortcuts.admin_media_prefix = '/missing-admin-media-prefix/';
-        }
+       
+            DateTimeShortcuts.admin_media_prefix = "/static/admin/"
+   
 
         var inputs = document.getElementsByTagName('input');
         for (i=0; i<inputs.length; i++) {

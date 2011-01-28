@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Kalendar{% endblock %}
+
+{% block menu %}
+<a class="hidden" href="/kalendar/history">Your History </a> &nbsp;
+<a class="hidden" href="/kalendar/logout">Logout </a>
+{% endblock %}
+{% block content %}
+<style type="text/css">
+    h1{  margin-left:270px;}
+    .tab {margin:30px;}
+    .month { width: 80px; float: left;margin: 2px; padding: 3px;
+             border:2px ridge #000000; -moz-border-radius:5px; padding:5px; text-decoration:none; color:#000000;}
+    .month:hover{ border-style:solid; }
+    .month a { text-decoration: none; margin: 4px; color:#000000;}
+    .month a:visited {text-decoration: none; margin: 4px; color:#000000; }
+    .clear { clear: both; }
+    .current {width: 80px; float: left; margin: 2px; padding: 3px; background: #eeeec8;
+              border:2px ridge #000000; -moz-border-radius:5px; padding:5px; text-decoration:none; color:#000000; font-weight:bolder;}
+    .current a { text-decoration: none; margin: 4px; color:#000000; }
+    .current a:visited {text-decoration: none; margin: 4px; color:#000000; }
+    .current:hover{ border-style:solid; }
+</style>
+<title>Add entry | B110 Booking Software</title>
+
+<!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="/Users/Yannic/PycharmProjects/bookingCal/static/admin/css/ie.css" /><![endif]-->
+
+<!--<script type="text/javascript" src="../../../jsi18n/"></script>-->
+<script type="text/javascript" src="/static/admin/js/core.js"></script>
+<script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
+<script type="text/javascript" src="/static/admin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/static/admin/js/jquery.init.js"></script>
+<script type="text/javascript" src="/static/admin/js/actions.min.js"></script>
+<script type="text/javascript" src="/static/admin/js/calendar.js"></script>
+<script type="text/javascript" src="/static/admin/js/admin/DateTimeShortcuts.js"></script>
+
+
+
+<div id="content">
+
+    <h1>Add entry</h1>
+    <div id="content-main">
+        <form action="/kalendar/new/dbadd/" method="post" accept-charset="utf-8" id="entry_form">{% csrf_token %}
+            <div style='display:none'>
+                <input type='hidden' name='csrf'  /></div>
+            <div>
+
+                {% if error_message %}
+                <div class="error">
+                    <table>
+                        <tr>
+                            <td>
+                                 <img src="/static/main/symbol-error.png" height="50px;">
+                            </td>
+                            <td>
+                                           <pre>{{ error_message }} </pre>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                {% endif %}
+
+                <fieldset class="module aligned ">
+                    <h2>Equipment</h2>
+                    <div class="form-row equipment">
+                        <div>
+                            <label for="id_equipment" class="required">Equipment:</label>
+                            <input type="text" name="equipment" id="id_equipment" />
+                            <a href="javascript:showEquiptments()" class="related-lookup" id="lookup_id_equipment">
+                                <img src="/static/admin/img/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="module aligned ">
+                    <h2>Date information</h2>
+                    <div class="form-row date">
+                        <div>
+                            <label for="id_date_0" class="required">Date:</label>
+                            <p class="datetime">Date: <input name="date_0" class="vDateField" id="id_date_0" size="10" type="text" >
+
+                                <br>Time: <input name="date_1" id="id_date_1" class="vTimeField"  size="8" type="text"></p>
+                        </div>
+                    </div>
+                    <div class="form-row enddate">
+                        <div>
+                            <label for="id_enddate_0" class="required">Enddate:</label>
+                            <p class="datetime">Date: <input id="id_enddate_0" class="vDateField" name="enddate_0" size="10" type="text">
+
+                                <br>Time: <input id="id_enddate_1" class="vTimeField" name="enddate_1" size="8" type="text">
+                        </div>
+                    </div>
+                </fieldset>
+                <div id="CalendarDiv" class="overlay"> </div>
+                <fieldset class="module aligned ">
+                    <h2>Informations</h2>
+
+                    <div class="form-row title">
+                        <div>
+                            <label for="id_title" class="required">Title:</label>
+                            <input id="id_title" type="text"name="title" maxlength="40" />
+                        </div>
+                    </div>
+                    <div class="form-row body">
+                        <div>
+                            <label for="id_body" class="required">Extra Information:</label>
+                            <textarea id="id_body" rows="10" cols="40" name="body" class="vLargeTextField" wrap="pyhsical"></textarea>
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="submit-row" >
+                    <input type="submit" value="Complete the Reservation" class="submit" name="_save" />
+                </div>
+
+            </div>
+        </form></div>
+    <br class="clear" />
+</div>
+<div class="equipOverlay" id="overLay">
+    <table>
+
+        <tr>
+            <th><b>Name</b></th>
+            <th><b>Raum</b></th>
+            <th><b>Description</b></th>
+
+        </tr>
+        {% for entry in entries %}
+
+        <div class="entryEquip" name="overlasdivinner">
+            <tr id="entryTD" onclick="setEquiptment({{ entry.id }})" style="cursor:pointer" >
+                <td>{{ entry.name }}</td>
+                <td>{{ entry.room }}</td>
+                <td>{{ entry.desc }}</td>
+            </tr>
+        </div>
+
+        {% empty %}
+        <div class="entryEquip" >
+            <tr>
+                <td colspan="3">no Entry   </td>
+
+            </tr>
+        </div>
+
+        {% endfor %}
+    </table>
+
+</div>
+<script language="JavaScript"
+        type="text/javascript">
+            <!--
+            function showEquiptments() {
+                document.getElementById("overLay").style.visibility = "visible";
+
+            }
+            function setEquiptment(id){
+                document.getElementById("id_equipment").value=id;
+                document.getElementById("overLay").style.visibility = "hidden";
+
+
+            }
+            // -->
+</script>
+
+<!-- END Content -->
+{% endblock %}
