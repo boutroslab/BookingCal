@@ -15,6 +15,6 @@ urlpatterns = patterns('ecalendar.views',
                        (r"^change/(\d+)/$", "change"),
                        (r"^delete/$", "delete"),
                        (r"^logout/$", "logout"),
-                       (r"^changeadd/$", "changeadd"),
+                       (r"^changeadd/$", "changeadd")
 
-                       )
+)

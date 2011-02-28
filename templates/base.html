@@ -16,8 +16,12 @@
             <div class="menu">
                 <a href="/">Home </a>
                 <a href="/kalendar">Calendar</a>
-               
+                {% if request.session.username %}
+                eingeloggt
+                {% else %}
                 <a href="/kalendar/new">Add Entry</a>
+       {% endif %}
+              
 {% block menu %} {% endblock %}
             </div>
             <div id="content">

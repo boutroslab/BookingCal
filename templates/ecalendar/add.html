@@ -66,10 +66,11 @@
                     <div class="form-row equipment">
                         <div>
                             <label for="id_equipment" class="required">Equipment:</label>
-                            <input type="text" name="equipment" id="id_equipment" />
+                            <input type="text" name="equipment_name" id="id_equipment_name" disabled />
                             <a href="javascript:showEquiptments()" class="related-lookup" id="lookup_id_equipment">
-                                <img src="/static/admin/img/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>
-                        </div>
+         		          <img src="/static/admin/img/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>
+			     <input type="hidden" name="equipment" id="id_equipment" />
+			</div>
                     </div>
                 </fieldset>
                 <fieldset class="module aligned ">
@@ -77,17 +78,17 @@
                     <div class="form-row date">
                         <div>
                             <label for="id_date_0" class="required">Date:</label>
-                            <p class="datetime">Date: <input name="date_0" class="vDateField" id="id_date_0" size="10" type="text" >
+                            <p class="datetime">Date: <input name="date_0" class="vDateField" id="id_date_0" size="10" type="text" readonly>
 
-                                <br>Time: <input name="date_1" id="id_date_1" class="vTimeField"  size="8" type="text"></p>
+                                <br>Time: <input name="date_1" id="id_date_1" class="vTimeField"  size="8" type="text" readonly></p>
                         </div>
                     </div>
                     <div class="form-row enddate">
                         <div>
                             <label for="id_enddate_0" class="required">Enddate:</label>
-                            <p class="datetime">Date: <input id="id_enddate_0" class="vDateField" name="enddate_0" size="10" type="text">
+                            <p class="datetime">Date: <input id="id_enddate_0" class="vDateField" name="enddate_0" size="10" type="text" readonly>
 
-                                <br>Time: <input id="id_enddate_1" class="vTimeField" name="enddate_1" size="8" type="text">
+                                <br>Time: <input id="id_enddate_1" class="vTimeField" name="enddate_1" size="8" type="text" readonly></p>
                         </div>
                     </div>
                 </fieldset>
@@ -128,7 +129,7 @@
         {% for entry in entries %}
 
         <div class="entryEquip" name="overlasdivinner">
-            <tr id="entryTD" onclick="setEquiptment({{ entry.id }})" style="cursor:pointer" >
+            <tr id="entryTD" onclick="setEquiptment({{ entry.id }},'{{ entry.name }}')" style="cursor:pointer" >
                 <td>{{ entry.name }}</td>
                 <td>{{ entry.room }}</td>
                 <td>{{ entry.desc }}</td>
@@ -154,11 +155,10 @@
                 document.getElementById("overLay").style.visibility = "visible";
 
             }
-            function setEquiptment(id){
+            function setEquiptment(id,name){
                 document.getElementById("id_equipment").value=id;
                 document.getElementById("overLay").style.visibility = "hidden";
-
-
+		document.getElementById("id_equipment_name").value=name;
             }
             // -->
 </script>

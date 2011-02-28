@@ -1,13 +1,11 @@
-# Django settings for helloWorld project.
-from django_auth_ldap.config import LDAPSearch  , GroupOfNamesType
-import ldap
+## Django settings for helloWorld project.
 
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-          # ('Your Name', 'your_email@domain.com'),
+           ('Yannic', 'your_email@domain.com'),
           )
 
 MANAGERS = ADMINS
@@ -15,13 +13,15 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'book', # Or path to database file if using sqlite3.
-        'USER': 'test', # Not used with sqlite3.
-        'PASSWORD': 'test', # Not used with sqlite3.
+        'NAME': 'booking', # Or path to database file if using sqlite3.
+        'USER': 'django', # Not used with sqlite3.
+        'PASSWORD': '!dj4n6o', # Not used with sqlite3.
         'HOST': 'localhost', # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '', # Set to empty string for default. Not used with sqlite3.
     }
 }
+
+
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -30,6 +30,7 @@ DATABASES = {
 # timezone as the operating system.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
+
 #TIME_ZONE = 'America/Chicago'
 TIME_ZONE = 'Europe/Berlin'
 
@@ -49,18 +50,19 @@ USE_L10N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = "/Users/Yannic/PycharmProjects/bookingCal/static"
+#MEDIA_ROOT = '/var/www/django/django_projects/bookingCal/static'
+MEDIA_ROOT='/Users/Yannic/PycharmProjects/bookingCal/static/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '/main/'
+#MEDIA_URL = '/media/'
 
 # URL prefix for bookingCal media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
 
-ADMIN_MEDIA_PREFIX = '/Users/Yannic/PycharmProjects/bookingCal/static/admin/'
+#ADMIN_MEDIA_PREFIX = '/var/www/django/admin_media/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'eu_2&go98qy@ad&(g^!hggtt=i#+hjg48*-u$)0)+a-8!6c=b-'
@@ -86,7 +88,7 @@ TEMPLATE_DIRS = (
                  # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
                  # Always use forward slashes, even on Windows.
                  # Don't forget to use absolute paths, not relative paths.
-                 "/Users/Yannic/PycharmProjects/bookingCal/templates"
+                 'templates'
                  )
 
 INSTALLED_APPS = (
@@ -96,6 +98,6 @@ INSTALLED_APPS = (
                   'django.contrib.sites',
                   'django.contrib.messages',
                   'django.contrib.admin',
-                  'bookingCal.ecalendar',
-
+                  'bookingCal.ecalendar'
              )
+SESSION_COOKIE_AGE = 1800
