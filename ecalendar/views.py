@@ -63,8 +63,13 @@ def main(request, year=None):
                 current = True
             mlst.append(dict(n=n + 1, name=month, entry=entry, current=current))
         lst.append((y, mlst))
+    if request.session.get('ldapU_is_auth'):
+        context=True
+    else:
+        context=False
+
     return render_to_response("ecalendar/index.html", dict(years=lst, year=year,
-                              reminders=reminders(request),request=request))
+                              reminders=reminders(request),request=request,context=context))
 
 def month(request, year, month, change=None):
     """Listinng of days in 'month'. """
@@ -124,9 +129,11 @@ def month(request, year, month, change=None):
         if len(lst[week]) == 7:
             lst.append([])
             week += 1
-
-
-    return render_to_response("ecalendar/month.html", dict(year=year, month=month, month_days=lst, mname=mnames[month-1],request=request))
+    if request.session.get('ldapU_is_auth'):
+        context=True
+    else:
+        context=False
+    return render_to_response("ecalendar/month.html", dict(year=year, month=month, month_days=lst, mname=mnames[month-1],request=request,context=context))
 
 def day(request, year, month, day):
     year, month, day = int(year), int(month), int(day)
@@ -144,16 +151,21 @@ def day(request, year, month, day):
             if startdate <= checktime and enddate >= checktime:
                 check = Entry.objects.get(id=en.id)
                 entries.append(check)
-
-
-    return render_to_response("ecalendar/day.html", dict(year=year, month=month, day=day, entries=entries ,request=request))
+    if request.session.get('ldapU_is_auth'):
+        context=True
+    else:
+        context=False
+    return render_to_response("ecalendar/day.html", dict(year=year, month=month, day=day, entries=entries ,request=request,context=context))
 
 def event(request, evid):
-
+    if request.session.get('ldapU_is_auth'):
+        context=True
+    else:
+        context=False
     if evid:
         entries = Entry.objects.get(id=evid)
 
-    return render_to_response("ecalendar/event.html", dict(entries=entries ,request=request))
+    return render_to_response("ecalendar/event.html", dict(entries=entries ,request=request,context=context))
 
 def ldapU(request, username, password):
     c = {}
@@ -235,8 +247,8 @@ def backendAuth(username):
 def new(request):
     c = {}
     c.update(csrf(request))
-    if not request.session.get('ldapU_is_auth', False):
-        return render_to_response('ecalendar/new.html',{'request': request})
+    if not request.session.get('ldapU_is_auth'):
+        return render_to_response('ecalendar/new.html',c)
     else:
         return add(request,"")
     
@@ -244,9 +256,9 @@ def new(request):
 def add(request,errormsg):
     c = {}
     c.update(csrf(request))
-    
-    if request.session.get('ldapU_is_auth', False):
-        if  request.session.get('user_ID', False):
+    if request.session.get('ldapU_is_auth'):
+        if  request.session.get('user_ID'):
+            context=True
             print "user ID"
             print request.session['user_ID']
             print "LDAP AUTH"
@@ -256,7 +268,8 @@ def add(request,errormsg):
     print errormsg
     entries = Equipment.objects.filter(enabled=True).order_by('name')
 
-    return render_to_response('ecalendar/add.html', {"error_message": errormsg, 'entries':entries,'request': request},context_instance=RequestContext(request),request=request)
+#    return render_to_response('ecalendar/add.html', {"error_message": errormsg, 'entries':entries},context_instance=RequestContext(request),request=request)
+    return render_to_response('ecalendar/add.html',{"error_message": errormsg, 'entries':entries,'context':context },context_instance=RequestContext(request))
 
 #    return HttpResponse(render_to_response('ecalendar/add.html', c,  {"msg": errormsg}) )
 
@@ -268,15 +281,17 @@ def check(request):
         username = request.POST['username']
         password = request.POST['password']
         if username and password:
-            if not request.session.get('ldapU_is_auth', False):
+            if not request.session.get('ldapU_is_auth'):
                 if ldapU(request, username=username, password=password):
+                    request.session['ldapU_is_auth'] = True
                     backendAuth(username)
                     check = User.objects.get(username=username)
                     if check:
                         request.session['user_ID'] = check.id
+                        return add(request,"")
                     else:
                         return new(request)
-                    return add(request,"")
+                    
                 else:
                     return new(request)
             else:
@@ -291,8 +306,8 @@ def dbadd(request):
     c.update(csrf(request))
     errormsg=""
     if request.method == 'POST':
-        if request.session.get('ldapU_is_auth', False):
-           
+        if request.session.get('ldapU_is_auth'):
+            context=True
             Eid = request.POST['equipment']
             Entrytitle = request.POST['title']
             Entryinfo = request.POST['body']
@@ -337,44 +352,13 @@ def dbadd(request):
             if sDT>eDT:
                 errormsg+="\nThe end time is before the start time !"
                 return add(request,errormsg)
-          
-#            print "Equiptment ID"
-#            print Eid
-#            print"Entry Title"
-#            print Entrytitle
-#            print"Entry INformation"
-#            print Entryinfo
-#
-#            print"DATEEEEE"
-#            print"date Start "
-#            print Entrydate1
-#            print"time Start"
-#            print Entrytime1
-#            print"date ende"
-#            print Entrydate2
-#            print"time ende"
-#            print Entrytime2
-#            print "\nDateTime chagned"
-#            print "DateTime Start"
-#            print sDT
-#            print "DateTime Ende"     
-#            print eDT
-
+      
 #            Checknumber is for the errorcounter
             checknumber = 0
             for e in Entry.objects.raw('SELECT * FROM ecalendar_entry'):
 
-#                print "equipment check"
-#                print Eid+ " == "
-#                print str(e.equipment_id)
 
                 if Eid == str(e.equipment_id):
-
-#                    print "DAte check"
-#                    print str(sDT) +" >= "+str(e.date)+" and "+str(eDT)+" <= "+str(e.enddate)
-#                    print str(sDT) +" >= "+str(e.date)+" and "+str(sDT)+" <= "+str(e.enddate)+" and "+str(eDT)+ " >= " +str(e.enddate)
-#                    print str(sDT) +" <= "+str(e.date)+" and "+str(eDT)+" >= "+str(e.date)+" and "+str(eDT)+ " <= " +str(e.enddate)
-#                    print str(sDT) +" <= "+str(e.date)+" and "+str(eDT)+" >= "+str(e.enddate)
 
                     if sDT >= e.date and eDT <= e.enddate:
                         checknumber += 1
@@ -419,32 +403,34 @@ def dbadd(request):
                 )
                 eNew.save()
 
-            return render_to_response('ecalendar/input.html',{'request': request,c:c})
+            return render_to_response('ecalendar/input.html',{'context':context})
         else:
-            return render_to_response('ecalendar/new.html',{'request': request,c:c})
+            return render_to_response('ecalendar/new.html',{'context':context})
     else:
-        return render_to_response('ecalendar/add.html',{'request': request,c:c})
+        return render_to_response('ecalendar/add.html',{'context':context})
 
 
 
 def history(request):
-    
-    if request.session.get('ldapU_is_auth', False):
+    if request.session.get('ldapU_is_auth'):
+        context=True
         usEn=User.objects.get(id=request.session['user_ID'])
         if usEn:
             entries = Entry.objects.filter(creator=usEn).order_by('-enddate')
-            return render_to_response("ecalendar/history.html",dict(entries=entries))
+            return render_to_response("ecalendar/history.html",{'context':context,'entries':entries})
         else:
              return add(request,"Your User is not available!\n ")
     else:
-        return render_to_response('ecalendar/new.html',{'request': request,c:c})
+        return render_to_response('ecalendar/new.html')
 
 def logout(request):
     del request.session['ldapU_is_auth']
     del request.session['user_ID']
-    return render_to_response('ecalendar/index.html',{'request': request,c:c})
+    return render_to_response('ecalendar/index.html')
 
 def change(request, evid):
+    if request.session.get('ldapU_is_auth'):
+        context=True
     errormsg=""
     splitstring= evid.split('|');
     evid=splitstring[0]
@@ -464,15 +450,18 @@ def change(request, evid):
         et = end.strftime("%H:%M:%S")
         entries2 = Equipment.objects.filter(enabled=True).order_by('name')
 
-    return render_to_response("ecalendar/change.html", {"error_message": errormsg, 'entries':entries,'entries2':entries2,'startdate':sd,'starttime':st,'enddate':ed,'endtime':et,'request': request},context_instance=RequestContext(request))
+    return render_to_response("ecalendar/change.html", {"error_message": errormsg, 'entries':entries,'entries2':entries2,'startdate':sd,'starttime':st,'enddate':ed,'endtime':et,'context':context },context_instance=RequestContext(request))
             
             
 def changeadd(request):
+    if request.session.get('ldapU_is_auth'):
+        context=True
+
     c = {}
     c.update(csrf(request))
 
     if request.method == 'POST':
-        if request.session.get('ldapU_is_auth', False):
+        if request.session.get('ldapU_is_auth'):
 
             Entryid = request.POST['entry']
             errormsg=Entryid+"|"
@@ -520,45 +509,17 @@ def changeadd(request):
             if sDT>eDT:
                 errormsg+="\nThe end time is before the start time !"
                 return change(request,errormsg)
-          
-#            print "Equiptment ID"
-#            print Eid
-#            print"Entry Title"
-#            print Entrytitle
-#            print"Entry INformation"
-#            print Entryinfo
-#
-#            print"DATEEEEE"
-#            print"date Start "
-#            print Entrydate1
-#            print"time Start"
-#            print Entrytime1
-#            print"date ende"
-#            print Entrydate2
-#            print"time ende"
-#            print Entrytime2
-#            print "\nDateTime chagned"
-#            print "DateTime Start"
-#            print sDT
-#            print "DateTime Ende"     
-#            print eDT
+
 
 #            Checknumber is for the errorcounter
             checknumber = 0
             for e in Entry.objects.raw('SELECT * FROM ecalendar_entry'):
                 if str(e.id) !=Entryid:
                     print str(e.id) +" != "+ Entryid
-#                print "equipment check"
-#                print Eid+ " == "
-#                print str(e.equipment_id)
+                    
 
                     if Eid == str(e.equipment_id):
 
-#                    print "DAte check"
-#                    print str(sDT) +" >= "+str(e.date)+" and "+str(eDT)+" <= "+str(e.enddate)
-#                    print str(sDT) +" >= "+str(e.date)+" and "+str(sDT)+" <= "+str(e.enddate)+" and "+str(eDT)+ " >= " +str(e.enddate)
-#                    print str(sDT) +" <= "+str(e.date)+" and "+str(eDT)+" >= "+str(e.date)+" and "+str(eDT)+ " <= " +str(e.enddate)
-#                    print str(sDT) +" <= "+str(e.date)+" and "+str(eDT)+" >= "+str(e.enddate)
 
                         if sDT >= e.date and eDT <= e.enddate:
                             checknumber += 1
@@ -605,25 +566,26 @@ def changeadd(request):
                     creator = usEn
                 )
 
-                return render_to_response('ecalendar/changed.html',{'request': request,c:c})
+                return render_to_response('ecalendar/changed.html',{'context':context})
         else:
-            return render_to_response('ecalendar/new.html',{'request': request,c:c})
+            return render_to_response('ecalendar/new.html',{'context':context})
     else:
-        return render_to_response('ecalendar/add.html',{'request': request,c:c})
+        return render_to_response('ecalendar/add.html',{'context':context})
 
 def delete(request):
     c = {}
     c.update(csrf(request))
-
+    if request.session.get('ldapU_is_auth'):
+        context=True
     if request.method == 'POST':
-        if request.session.get('ldapU_is_auth', False):
+        if request.session.get('ldapU_is_auth'):
 
             Entryid = request.POST['entry']
             Entry.objects.filter(id=Entryid).delete()
 
-            return render_to_response('ecalendar/delete.html',{'request': request,c:c})
+            return render_to_response('ecalendar/delete.html',{'context':context})
 
         else:
-            return render_to_response('ecalendar/new.html',{'request': request,c:c})
+            return render_to_response('ecalendar/new.html',{'context':context})
     else:
-          return render_to_response('ecalendar/new.html',{'request': request,c:c})
+          return render_to_response('ecalendar/new.html',{'context':context})

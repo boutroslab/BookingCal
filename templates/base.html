@@ -16,13 +16,16 @@
             <div class="menu">
                 <a href="/">Home </a>
                 <a href="/kalendar">Calendar</a>
-                {% if request.session.username %}
-                eingeloggt
-                {% else %}
+                {% if context %}
                 <a href="/kalendar/new">Add Entry</a>
-       {% endif %}
-              
-{% block menu %} {% endblock %}
+                <a class="hidden" href="/kalendar/history">Your History </a> &nbsp;
+                <a class="hidden" href="/kalendar/logout">Logout </a>
+
+                {% else %}
+                <a href="/kalendar/new">Login</a>
+                {% endif %}
+
+                {% block menu %} {% endblock %}
             </div>
             <div id="content">
                 {% block content %}{% endblock %}
