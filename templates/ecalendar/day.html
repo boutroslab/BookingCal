@@ -8,14 +8,14 @@
 
         h2 { text-align: left; margin-left: 50px; font-size:22px; }
 
-        .inp1 { cursor: pointer;font-size:15px; width: 300px; float:left; border:2px ridge #cccccc; padding:10px; -moz-border-radius:5px; border-radius: 5px 5px 5px 5px;}
+        .inp1 { cursor: pointer;font-size:15px; width: 350px; float:left; border:2px ridge #cccccc; padding:10px; -moz-border-radius:5px; border-radius: 5px 5px 5px 5px;}
         .inp1:hover{ border-style:solid; }
         .inp1 a:visited{ text-decoration:none;}
         .inp1 a{text-decoration:none; color:#000000;}
         .inp1 a:hover{ text-decoration:none; font-weight:bold;}
         .inp1 td{padding:5px;}
 
-        .inp2 {cursor: pointer; width:400px; font-size:15px; width: 300px; float:left; border:2px ridge #cccccc; padding:10px; -moz-border-radius:5px; border-radius: 5px 5px 5px 5px;}
+        .inp2 {cursor: pointer; width:400px; font-size:15px; width: 350px; float:left; border:2px ridge #cccccc; padding:10px; -moz-border-radius:5px; border-radius: 5px 5px 5px 5px;}
         .inp2:hover{ border-style:solid; }
         .inp2 a:visited{ text-decoration:none;}
         .inp2 a{text-decoration:none; color:#000000;}
@@ -40,17 +40,29 @@
             title='Click to view this booking'>
                  <table>
                     <tr>
-                        <td><b>Titel:</b> </td>
-                        <td>{{ entry.title }}    </td>
+                        <td><b>Equipment:</b></td>
+                        <td><b>{{ entry.equipment.name }}</b></td>
                     </tr>
                     <tr>
-                        <td><b>Equipment:</b></td>
-                        <td>{{ entry.equipment.name }}</td>
+                        <td><b>Title:</b> </td>
+                        <td>{{ entry.title }}    </td>
                     </tr>
                     <tr>
                         <td><b>Creator:</b></td>
                         <td>{{ entry.creator }}</td>
                     </tr>
+                <tr>
+                    <td><b>Start Date:</b></td>
+                    <td>{{ entry.date}} </td>
+                </tr>
+                <tr>
+                    <td><b>End Date:</b></td>
+                    <td>{{ entry.enddate }}</td>
+                </tr>
+                <tr>
+                    <td valign="top"><b>Information:</b></td>
+		    <td><pre> {{ entry.body }}</pre></td>
+                </tr>
                 </table>
             </div>
 

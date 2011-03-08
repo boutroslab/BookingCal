@@ -3,100 +3,109 @@
 {% block title %}Kalendar{% endblock %}
 
 {% block content %}
-   <script type="text/javascript">
-          function equipmentview(){
-
-              var div1 = document.getElementById('equip')
-              var div2 = document.getElementById('equipt')
-                  if (div1.style.display == 'none') {
-                      div1.style.display = 'block'
-                      div2.title="Click to hide equipment informations"
-                  } else {
-                      div1.style.display = 'none'
-                      div2.title="Click to view equipment informations"
-                  }
-          }
+<script type="text/javascript">
+    function equipmentview(){
+        document.getElementById("equip").style.visibility = "visible";
+        document.getElementById("equipt").title="Click to hide equipment informations";
+    }
+    function equipmentClose(){
+        document.getElementById("equip").style.visibility = "hidden";
+        document.getElementById("equipt").title="Click to view equipment informations";
+    }
 
 
-    </script>
 
-      <style type="text/css">
+</script>
 
-        .entry { border: 3px solid #eee; padding: 10px; width: 560px; margin: 9px; clear:both;}
+<style type="text/css">
 
-        #inp1 { text-align: left; width: 550px; }
-        #inp1 td{ min-width:150px; font-size:15px;}
-        h2 { text-align: left; margin-left: 50px; font-size:22px;}
-        .back {  border:2px ridge #000000; -moz-border-radius:5px; padding:5px; text-decoration:none; color:#000000; font-weight:bolder; }
-        .back:hover{ border-style:solid; }
-        #equip{
-            display:none;
-            margin-left:20px;
-        }
-        #equip h2{ text-align: left; margin-left: 70px; font-size:22px; }
-        #equipInnen{
-            border: 3px solid #eee; padding: 10px; width: 560px; margin: 9px; clear:both; min-width:150px; font-size:15px;
-            display:block;
-        }
-        #equipInnen td{ min-width:150px; font-size:15px;}
-      #equipt{
-          cursor: pointer;
-      }
-    </style>
-    <br />
+    .entry { border: 3px solid #eee; padding: 10px; width: 560px; margin: 9px; clear:both;}
 
-    <a class="back" href="javascript:history.back()" > &lt;&lt; back </a>
+    #inp1 { text-align: left; width: 550px; }
+    #inp1 td{ min-width:150px; font-size:15px;}
+    h2 { text-align: left; margin-left: 50px; font-size:22px;}
+    .back {  border:2px ridge #000000; -moz-border-radius:5px; padding:5px; text-decoration:none; color:#000000; font-weight:bolder; }
+    .back:hover{ border-style:solid; }
+    #equip{
+        visibility: hidden;
+        margin-left:20px;
+    }
+    #equip h2{ text-align: left; margin-left: 70px; font-size:22px; }
+    #equipInnen{
+        border: 3px solid #eee; padding: 10px; width: 560px; margin: 9px; clear:both; min-width:150px; font-size:15px;
+        display:block;
+    }
+    #equipInnen td{ min-width:150px; font-size:15px;}
+    #equipt{
+        cursor: pointer;
+    }
+</style>
+<br />
 
-    {% if entries %}
-    <h2> {{ entries.title }}</h2>
-        <div class="entry">
-            <div id="inp1" >
-            <table>
-                <tr id="equipt" title="Click to view equipment informations">
-                    <td><b>Equipment:</b></td>
-                    <td  onClick="equipmentview()" style="cursor:pointer">{{ entries.equipment.name }}</td>
-                </tr>
-                <tr>
-                    <td><b>Start Date:</b></td>
-                    <td>{{ entries.date}} </td>
-                </tr>
-                <tr>
-                    <td><b>End Date:</b></td>
-                    <td>{{ entries.enddate }}</td>
-                </tr>
-                <tr>
-                    <td><b>Creator:</b></td>
-                    <td>{{ entries.creator }}</td>
-                </tr>
-                <tr>
-                    <td valign="top"><b>Information:</b></td>
-		    <td><pre> {{ entries.body }}</pre></td>
-                </tr>
+<a class="back" href="javascript:history.back()" > &lt;&lt; back </a>
 
-            </table>
-        </div>
-        </div>
-        <div  id="equip">
-            <h2>{{ entries.equipment.name }} </h2>
-            <div id="equipInnen">
+{% if entries %}
+<h2> {{ entries.title }}</h2>
+<div class="entry">
+    <div id="inp1" >
+        <table>
+            <tr id="equipt" title="Click to view equipment informations">
+                <td><b>Equipment:</b></td>
+                <td  onClick="equipmentview()" style="cursor:pointer">{{ entries.equipment.name }}</td>
+            </tr>
+            <tr>
+                <td><b>Start Date:</b></td>
+                <td>{{ entries.date}} </td>
+            </tr>
+            <tr>
+                <td><b>End Date:</b></td>
+                <td>{{ entries.enddate }}</td>
+            </tr>
+            <tr>
+                <td><b>Creator:</b></td>
+                <td>{{ entries.creator }}</td>
+            </tr>
+            <tr>
+                <td valign="top"><b>Information:</b></td>
+                <td><pre> {{ entries.body }}</pre></td>
+            </tr>
 
-                <table>
-                             <tr>
-                                <td><b>Room:</b></td>
-                                <td>{{ entries.equipment.room }}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Person:</b></td>
-                                <td>{{ entries.equipment.person }}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Description:</b></td>
-                                <td>{{ entries.equipment.desc }}</td>
-                            </tr>
-                </table>
-            </div>
-        </div>
-    {% else %}
-        No Event selected
-    {%  endif %}
+        </table>
+    </div>
+</div>
+<div  id="equip">
+    <table>
+        <tr>
+            <td width="520px">
+                <h2>{{ entries.equipment.name }} </h2>
+            </td>
+            <td>
+                <a href="javascript:equipmentClose()" style="  color:#800000" >
+                    <img src="/static/main/close.png" width="20" alt="Close" /> Hide
+                </a>
+            </td>
+        </tr>
+    </table>
+
+    <div id="equipInnen">
+
+        <table>
+            <tr>
+                <td><b>Room:</b></td>
+                <td>{{ entries.equipment.room }}</td>
+            </tr>
+            <tr>
+                <td><b>Person:</b></td>
+                <td>{{ entries.equipment.person }}</td>
+            </tr>
+            <tr>
+                <td><b>Description:</b></td>
+                <td>{{ entries.equipment.desc }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+{% else %}
+No Event selected
+{%  endif %}
 {% endblock %}

@@ -23,6 +23,8 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render_to_response
 import ldap
 from django.template import RequestContext
+import re
+
 
 mnames = "January February March April May June July August September October November December"
 mnames = mnames.split()
@@ -71,10 +73,14 @@ def main(request, year=None):
     return render_to_response("ecalendar/index.html", dict(years=lst, year=year,
                               reminders=reminders(request),request=request,context=context))
 
-def month(request, year, month, change=None):
+def month(request, year, month, change=None,eq=None):
     """Listinng of days in 'month'. """
     year, month = int(year), int(month)
-
+    sort=False
+    if change == "sort":
+        eq = int(eq)
+        sort=True
+        print eq
     #apply next/previos change
     if change in ("next", "prev"):
 
@@ -107,7 +113,12 @@ def month(request, year, month, change=None):
             fday = day
             checktime = datetime(year, month, fday)
 
-            a = Entry.objects.all()
+            if sort:
+                equip=Equipment.objects.get(id=eq)
+                a = Entry.objects.filter(equipment=equip)
+            else:
+                a = Entry.objects.all()
+        
             entries = []
             for en in a:
                 startdate = datetime(en.date.year, en.date.month, en.date.day)
@@ -116,7 +127,7 @@ def month(request, year, month, change=None):
                 if startdate <= checktime and enddate >= checktime:
                     check = Entry.objects.get(id=en.id)
                     if len(entries) == 3:
-                        check.title = "and more"
+                        check.equipment.name = "and more"
                         entries.append(check)
                         break
 
@@ -133,16 +144,22 @@ def month(request, year, month, change=None):
         context=True
     else:
         context=False
-    return render_to_response("ecalendar/month.html", dict(year=year, month=month, month_days=lst, mname=mnames[month-1],request=request,context=context))
+    equipment=Equipment.objects.all()
+        
+    return render_to_response("ecalendar/month.html", dict(year=year, month=month, month_days=lst, mname=mnames[month-1],request=request,context=context,equipment=equipment))
 
-def day(request, year, month, day):
+def day(request, year, month, day, eq=None):
     year, month, day = int(year), int(month), int(day)
 
     if day:
         fday = day
         checktime = datetime(year, month, fday)
 
-        a = Entry.objects.all()
+        if eq:
+            equip=Equipment.objects.get(id="1")
+            a = Entry.objects.filter(equipment=equip)
+        else:
+           a = Entry.objects.all()
         entries = []
         for en in a:
             startdate = datetime(en.date.year, en.date.month, en.date.day)
@@ -155,7 +172,8 @@ def day(request, year, month, day):
         context=True
     else:
         context=False
-    return render_to_response("ecalendar/day.html", dict(year=year, month=month, day=day, entries=entries ,request=request,context=context))
+    equipment=Equipment.objects.all()
+    return render_to_response("ecalendar/day.html", dict(year=year, month=month, day=day, entries=entries ,request=request,context=context,equipment=equipment))
 
 def event(request, evid):
     if request.session.get('ldapU_is_auth'):
@@ -295,7 +313,7 @@ def check(request):
                 else:
                     return new(request)
             else:
-                 return new(request)
+                return add(request,"")
         else:
             return new(request)
     else:
@@ -317,6 +335,7 @@ def dbadd(request):
             Entrydate2 = request.POST['enddate_0']
             Entrytime1 = request.POST['date_1']
             Entrytime2 = request.POST['enddate_1']
+            regex = re.compile("\A[0-2]\d:[0-5]\d:[0-5]\d\Z")
 
 #            inputcheck
             inputcheck=0
@@ -338,15 +357,21 @@ def dbadd(request):
             if Entrytime2 =="" :
                 inputcheck += 1
                 errormsg+="\nThe end time is missing !"
+            if not regex.search(Entrytime1):
+                inputcheck += 1
+                errormsg+="\nThe start time has a wrong Format ! The right Format is: HH:MM:SS"
+            if not regex.search(Entrytime2):
+                inputcheck += 1
+                errormsg+="\nThe end time has a wrong Format ! The right Format is: HH:MM:SS"
             if inputcheck > 0:
                 return add(request,errormsg)
 
 #            dateformat creating
             time_format = "%Y-%m-%d %H:%M:%S"
             Startdate=Entrydate1+" "+Entrytime1
-            sDT = datetime.fromtimestamp(time.mktime(time.strptime(Startdate, time_format)))
-
             Enddate=Entrydate2+" "+Entrytime2
+            
+            sDT = datetime.fromtimestamp(time.mktime(time.strptime(Startdate, time_format)))
             eDT = datetime.fromtimestamp(time.mktime(time.strptime(Enddate, time_format)))
 
             if sDT>eDT:
@@ -402,8 +427,13 @@ def dbadd(request):
                     creator = usEn
                 )
                 eNew.save()
-
-            return render_to_response('ecalendar/input.html',{'context':context})
+                Entrydate1
+                b=Entrydate1.split("-")
+                year = b[0]
+                month = b[1]
+                print year
+                print month
+            return render_to_response('ecalendar/input.html',{'context':context,'year':year,'month':month})
         else:
             return render_to_response('ecalendar/new.html',{'context':context})
     else:
@@ -416,7 +446,7 @@ def history(request):
         context=True
         usEn=User.objects.get(id=request.session['user_ID'])
         if usEn:
-            entries = Entry.objects.filter(creator=usEn).order_by('-enddate')
+            entries = Entry.objects.filter(creator=usEn).order_by('-enddate')[:16]
             return render_to_response("ecalendar/history.html",{'context':context,'entries':entries})
         else:
              return add(request,"Your User is not available!\n ")
@@ -474,6 +504,7 @@ def changeadd(request):
             Entrydate2 = request.POST['enddate_0']
             Entrytime1 = request.POST['date_1']
             Entrytime2 = request.POST['enddate_1']
+            regex = re.compile("\A[0-2]\d:[0-5]\d:[0-5]\d\Z")
 
 #            inputcheck
             inputcheck=0
@@ -495,15 +526,21 @@ def changeadd(request):
             if Entrytime2 =="" :
                 inputcheck += 1
                 errormsg+="\nThe end time is missing !"
+            if not regex.search(Entrytime1):
+                inputcheck += 1
+                errormsg+="\nThe start time has a wrong Format ! The right Format is: HH:MM:SS"
+            if not regex.search(Entrytime2):
+                inputcheck += 1
+                errormsg+="\nThe end time has a wrong Format ! The right Format is: HH:MM:SS"
             if inputcheck > 0:
                 return change(request,errormsg)
 
 #            dateformat creating
             time_format = "%Y-%m-%d %H:%M:%S"
             Startdate=Entrydate1+" "+Entrytime1
-            sDT = datetime.fromtimestamp(time.mktime(time.strptime(Startdate, time_format)))
-
             Enddate=Entrydate2+" "+Entrytime2
+
+            sDT = datetime.fromtimestamp(time.mktime(time.strptime(Startdate, time_format)))
             eDT = datetime.fromtimestamp(time.mktime(time.strptime(Enddate, time_format)))
 
             if sDT>eDT:

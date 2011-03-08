@@ -69,10 +69,42 @@
                     <div class="form-row equipment">
                         <div>
                             <label for="id_equipment" class="required">Equipment:</label>
-			    <input type="text" name="equipment_name" id="id_equipment_name" value="{{ entries.equipment.name }}" disabled />
+                            <input type="text" name="equipment_name" id="id_equipment_name" value="{{ entries.equipment.name }}" disabled />
                             <a href="javascript:showEquiptments()" class="related-lookup" id="lookup_id_equipment">
-                                  <img src="/static/admin/img/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>
-                             <input type="hidden" name="equipment" id="id_equipment"  value="{{ entries.equipment.id }}" />
+                                <img src="/static/admin/img/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>
+                            <div class="equipOverlay" id="overLay">
+                                <table>
+                                    <tr class="entryHead">
+                                        <td colspan="3"><b>Choose a Equipment</b></td>
+                                    </tr>
+                                    <tr class="entryUnderHead">
+                                        <th>Name</th>
+                                        <th>Room</th>
+                                        <th>Description</th>
+
+                                    </tr>
+
+                                    {% for entry in entries2 %}
+
+                                    <tr id="entryTD" class="entryTD" onclick="setEquiptment({{ entry.id }},'{{ entry.name }}')" style="cursor:pointer">
+                                        <td>{{ entry.name }}</td>
+                                        <td>{{ entry.room }}</td>
+                                        <td>{{ entry.desc }}</td>
+                                    </tr>
+
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="3">no Entry   </td>
+                                    </tr>
+
+                                    {% endfor %}
+                                    <tr class="entryCancel"  >
+                                        <td colspan="3" onclick="cancelOverlay()" ><b style="cursor:pointer">Cancel</b></td>
+                                    </tr>
+                                </table>
+
+                            </div>
+                            <input type="hidden" name="equipment" id="id_equipment"  value="{{ entries.equipment.id }}" />
                         </div>
                     </div>
                 </fieldset>
@@ -81,15 +113,15 @@
                     <div class="form-row date">
                         <div>
                             <label for="id_date_0" class="required">Date:</label>
-                            <p class="datetime">Date: <input name="date_0" class="vDateField" id="id_date_0" size="10" type="text"  value="{{ startdate }}">
+                            <p class="datetime">Date: <input name="date_0" class="vDateField" id="id_date_0" size="10" type="text"  value="{{ startdate }}" readonly>
 
-                                <br>Time: <input name="date_1" id="id_date_1" class="vTimeField"  size="8" type="text" value="{{ starttime }}"></p>
+                                <br>Time: <input name="date_1" id="id_date_1" class="vTimeField"  size="8" type="text" value="{{ starttime }}" ></p>
                         </div>
                     </div>
                     <div class="form-row enddate">
                         <div>
                             <label for="id_enddate_0" class="required">Enddate:</label>
-                            <p class="datetime">Date: <input id="id_enddate_0" class="vDateField" name="enddate_0" size="10" type="text" value="{{ enddate }}">
+                            <p class="datetime">Date: <input id="id_enddate_0" class="vDateField" name="enddate_0" size="10" type="text" value="{{ enddate }}" readonly>
 
                                 <br>Time: <input id="id_enddate_1" class="vTimeField" name="enddate_1" size="8" type="text" value="{{ endtime }}">
                         </div>
@@ -114,50 +146,23 @@
                 </fieldset>
                 <div class="submit-row" >
                     <input type="submit" value="Complete the Reservation" class="submit" name="_save" />
-                </form>
-        <form action="/kalendar/delete/" method="post" id="delete_form" onsubmit="return confirmSubmit()">{% csrf_token %}
-            <input type='hidden' name='entry' value="{{ entries.id }}" />
-            <input type="submit" value="Delete the Reservation" class="deletelink" name="_delete" />
+                    </form>
+                    <form action="/kalendar/delete/" method="post" id="delete_form" onsubmit="return confirmSubmit()">{% csrf_token %}
+                        <input type='hidden' name='entry' value="{{ entries.id }}" />
+                        <input type="submit" value="Delete the Reservation" class="deletelink" name="_delete" />
 
 
-        </form>
-         </div>
+                    </form>
+                </div>
+            </div>
+            <br class="clear" />
     </div>
-    <br class="clear" />
-</div>
-<div class="equipOverlay" id="overLay">
-    <table>
-        <tr>
-            <th><b>Name</b></th>
-            <th><b>Raum</b></th>
-            <th><b>Description</b></th>
-        </tr>
-        {% for entry in entries2 %}
 
-  <div class="entryEquip" name="overlasdivinner">
-            <tr id="entryTD" onclick="setEquiptment({{ entry.id }},'{{ entry.name }}')" style="cursor:pointer" >
-                <td>{{ entry.name }}</td>
-                <td>{{ entry.room }}</td>
-                <td>{{ entry.desc }}</td>
-            </tr>
-        </div>
-
-        {% empty %}
-        <div class="entryEquip" >
-            <tr>
-                <td colspan="3">no Entry   </td>
-
-            </tr>
-        </div>
-
-        {% endfor %}
-    </table>
-  {% else %}
+    {% else %}
     No Event selected
     {%  endif %}
-</div>
-<script language="JavaScript"
-        type="text/javascript">
+    <script language="JavaScript"
+            type="text/javascript">
             <!--                                                                                                                                                                        
             function showEquiptments() {                                                                                                                                                
                 document.getElementById("overLay").style.visibility = "visible";                                                                                                        
@@ -169,7 +174,7 @@
                 document.getElementById("id_equipment_name").value=name;                                                                                                                
             }                                                                                                                                                                           
             // -->
-</script>
+    </script>
 
-<!-- END Content -->
-{% endblock %}
+    <!-- END Content -->
+    {% endblock %}

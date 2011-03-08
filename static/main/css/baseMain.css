@@ -643,13 +643,14 @@ ul.timelist, .timelist li {
     font-weight: bolder;
 }
 .equipOverlay{
-    position: fixed;
+    position: absolute;
     z-index:199;
-    top: 150px;
     left: 340px;
+    margin-top: -20px;
     visibility: hidden;
     background: white 0 100% repeat-x;
     border: 1px solid #ccc;
+  
 }
 .equipOverlay td{
     padding: 2px;
@@ -670,3 +671,35 @@ ul.timelist, .timelist li {
     border-radius: 5px 5px 5px 5px;
 }
 .back:hover{ border-style:solid; }
+
+.entryHead{
+    background-color: #7ca0c7;
+    color: #FFFFFF;
+    font-size: 14px;
+    padding: 0px;
+    text-align: center;
+    margin: 0px;
+}
+.entryUnderHead{
+    background-color: #e1e1e1;
+    color: #000000;
+    font-size: small;
+}
+.entryTD {
+    padding: 5PX;
+    font-weight: bold;
+}
+.entryTD:hover{
+    background-color:#5b80b2;
+    color: #FFFFFF;
+    font-weight: bold;
+
+}
+.entryCancel{
+    background-color: #e1e1e1;
+    color: #aaaaaa;
+    font-size: 10px;
+    text-align: center;
+    padding: 0px;
+    height: 10px;
+}
