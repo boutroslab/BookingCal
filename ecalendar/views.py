@@ -24,7 +24,10 @@ from django.shortcuts import render_to_response
 import ldap
 from django.template import RequestContext
 import re
-
+from django.utils import simplejson
+from django.shortcuts import render_to_response
+from django.core import serializers
+import string
 
 mnames = "January February March April May June July August September October November December"
 mnames = mnames.split()
@@ -94,7 +97,7 @@ def month(request, year, month, change=None,eq=None):
         year, month = (now + mod).timetuple()[:2]
 
         #init variables
-
+    equipname="Search..."
     cal = calendar.Calendar()
     month_days = cal.itermonthdays(year, month)
     nyear, nmonth, nday = time.localtime()[:3]
@@ -116,6 +119,7 @@ def month(request, year, month, change=None,eq=None):
             if sort:
                 equip=Equipment.objects.get(id=eq)
                 a = Entry.objects.filter(equipment=equip)
+                equipname=equip.name
             else:
                 a = Entry.objects.all()
         
@@ -146,7 +150,7 @@ def month(request, year, month, change=None,eq=None):
         context=False
     equipment=Equipment.objects.all()
         
-    return render_to_response("ecalendar/month.html", dict(year=year, month=month, month_days=lst, mname=mnames[month-1],request=request,context=context,equipment=equipment))
+    return render_to_response("ecalendar/month.html", dict(year=year, month=month, month_days=lst, mname=mnames[month-1],equipmentName=equipname,request=request,context=context,equipment=equipment))
 
 def day(request, year, month, day, eq=None):
     year, month, day = int(year), int(month), int(day)
@@ -234,7 +238,13 @@ def ldapU(request, username, password):
         try:
             l.bind_s(first_dn, adPW)
             ldapIn = True
-
+            for dn,entry in lusers:
+                if dn != None:
+                    print 'Processing',repr(dn)
+                    print entry['sAMAccountName']
+                    fname = entry['displayName']
+                    
+                    backendAuth(username,fname)
             print "Succcessfully bound - whoami says: "
         except ldap.INVALID_CREDENTIALS, err:
             print "LDAP Error: %s" % err
@@ -244,23 +254,31 @@ def ldapU(request, username, password):
 
     l.unbind()
     print "-" * 100
-    print "\n\n"
+    print "\n"
 
     return ldapIn
     
-def backendAuth(username):
+def backendAuth(username,name):
     password = '123Secret'
+#    user = User.objects.get(username=username)
+    print "Backend"
+    print name[0]
+    name_list = name[0].split(' ')
+    lastname = name_list[0]
+    firstname =name_list[1]
+    
     user = authenticate(username=username, password=password)
     if user is not None:
         return
     else:
         user = User.objects.create_user(username, '', password)
-        user.groups.add(0)
+        user.first_name = firstname
+        user.last_name = lastname
+        user.groups.add(1)
         user.is_active = True
         user.is_staff = False
         user.save()
-    return
-
+        return
 
 def new(request):
     c = {}
@@ -290,7 +308,38 @@ def add(request,errormsg):
     return render_to_response('ecalendar/add.html',{"error_message": errormsg, 'entries':entries,'context':context },context_instance=RequestContext(request))
 
 #    return HttpResponse(render_to_response('ecalendar/add.html', c,  {"msg": errormsg}) )
+def guest(request):
+    c = {}
+    c.update(csrf(request))
+    return render_to_response('ecalendar/guest.html',c)
 
+def guestReg(request):
+    if request.method == 'POST':
+        password = '123Secret'
+        firstname = request.POST['firstname']
+        lastname = request.POST['lastname']
+        firstName = "GUEST:  "
+        firstName += firstname
+        email = request.POST['email']
+        username = firstname +"_" +lastname
+        user = authenticate(username=username, password=password)
+        if user is None:
+            user = User.objects.create_user(username, email, password)
+            user.first_name = firstName
+            user.last_name = lastname
+            user.groups.add(1)
+            user.is_active = True
+            user.is_staff = False
+            user.save()
+        check = User.objects.get(username=username)
+        if check:
+            request.session['ldapU_is_auth'] = True
+            request.session['user_ID'] = check.id
+            return add(request,"")
+        else:
+            return guest(request)
+    else:
+         return guest(request)
 
 def check(request):
     c = {}
@@ -301,11 +350,11 @@ def check(request):
         if username and password:
             if not request.session.get('ldapU_is_auth'):
                 if ldapU(request, username=username, password=password):
-                    request.session['ldapU_is_auth'] = True
-                    backendAuth(username)
+#                    backendAuth(username)
                     check = User.objects.get(username=username)
                     if check:
                         request.session['user_ID'] = check.id
+                        request.session['ldapU_is_auth'] = True
                         return add(request,"")
                     else:
                         return new(request)
@@ -326,25 +375,66 @@ def dbadd(request):
     if request.method == 'POST':
         if request.session.get('ldapU_is_auth'):
             context=True
-            Eid = request.POST['equipment']
+          
             Entrytitle = request.POST['title']
             Entryinfo = request.POST['body']
+            anzahlEquip = request.POST['countEquip']
+#            get the equipments
+#            datumformation
 
-#            dateinformation
             Entrydate1 = request.POST['date_0']
             Entrydate2 = request.POST['enddate_0']
             Entrytime1 = request.POST['date_1']
             Entrytime2 = request.POST['enddate_1']
-            regex = re.compile("\A[0-2]\d:[0-5]\d:[0-5]\d\Z")
+            regex2 = re.compile("\A[0-2]\d:[0-5]\d$")
+            regex = re.compile("\A[0-2]\d:[0-5]\d:[0-5]\d\Z$")
+
+            if regex2.search(Entrytime1):
+                Entrytime1+=":00"
+            if regex2.search(Entrytime2):
+                Entrytime2+=":00"
 
 #            inputcheck
             inputcheck=0
+
+#            one equipment always in
+
+            Eid = request.POST['equipment']
+            
+            myEquipList=[Eid]
+            if not anzahlEquip =="":
+                countEquip = int(anzahlEquip)
+                equipSame=0
+                for i in range(2,countEquip+1):
+                    print "anzahl"
+                    print i
+                    equiPostName='equipment'+str(i)
+                    print "->"+equiPostName
+                    equip =request.POST[equiPostName]
+                    if equip =="":
+                        inputcheck += 1
+                        errormsg+="\nOne equipment is missing !"
+                    for i in myEquipList:
+
+                        if equip == i:
+                            equipSame+= 1
+                    if equipSame > 0:
+                        return add(request,"\nThe Equipments are the same!\nPlease select another one!")
+                    else:
+                        myEquipList.append(equip)
+
+            for i in myEquipList:
+                    print"Equip No"
+                    print i
+
             if Eid =="" :
                 inputcheck += 1
-                errormsg+="\nThe equipment ID is missing !"
-            if Entrytitle =="" :
-                inputcheck += 1
-                errormsg+="\nThe title is missing !"
+                errormsg+="\nThe First equipment is missing !"
+
+
+#            if Entrytitle =="" :
+#                inputcheck += 1
+#                errormsg+="\nThe title is missing !"
             if Entrydate1 =="" :
                 inputcheck += 1
                 errormsg+="\nThe start date is missing !"
@@ -359,10 +449,10 @@ def dbadd(request):
                 errormsg+="\nThe end time is missing !"
             if not regex.search(Entrytime1):
                 inputcheck += 1
-                errormsg+="\nThe start time has a wrong Format ! The right Format is: HH:MM:SS"
+                errormsg+="\nThe start time has a wrong Format ! The right Format is: HH:MM"
             if not regex.search(Entrytime2):
                 inputcheck += 1
-                errormsg+="\nThe end time has a wrong Format ! The right Format is: HH:MM:SS"
+                errormsg+="\nThe end time has a wrong Format ! The right Format is: HH:MM"
             if inputcheck > 0:
                 return add(request,errormsg)
 
@@ -377,62 +467,67 @@ def dbadd(request):
             if sDT>eDT:
                 errormsg+="\nThe end time is before the start time !"
                 return add(request,errormsg)
-      
-#            Checknumber is for the errorcounter
-            checknumber = 0
-            for e in Entry.objects.raw('SELECT * FROM ecalendar_entry'):
-
-
-                if Eid == str(e.equipment_id):
-
-                    if sDT >= e.date and eDT <= e.enddate:
-                        checknumber += 1
-                        errormsg+="\nThe Equipment is not available at this time!"
-                        return add(request,errormsg)
-                    elif sDT >= e.date and sDT <= e.enddate and eDT >= e.enddate :
-                        checknumber += 1
-                        errormsg+="\nThe Equipment is not available at this time!"
-                        return add(request,errormsg)
-                    elif sDT <= e.date and eDT >= e.date and eDT <= e.enddate :
-                        checknumber += 1
-                        errormsg+="\nThe Equipment is not available at this time!"
-                        return add(request,errormsg)
-                    elif sDT <= e.date and eDT >= e.enddate:
-                        checknumber += 1
-                        errormsg+="\nThe Equipment is not available at this time!"
-                        return add(request,errormsg)
-            for equipm in Equipment.objects.raw('SELECT * FROM ecalendar_equipment'):
-                if equipm.id == Eid:
-                    if equipm.enabled == False:
-                        checknumber += 1
-                        errormsg+="\nThe Equipment is not available!"
-                        return add(request,errormsg)
+            for i in myEquipList:
+                print"Equip No datecheck"
+                
+    #            Checknumber is for the errorcounter
+                checknumber = 0
+                for e in Entry.objects.raw('SELECT * FROM ecalendar_entry'):
+#                    print str(i) +' = ' + str(e.equipment_id)
+                    if str(i) == str(e.equipment_id):
+                        print"in"
+                        if sDT >= e.date and eDT <= e.enddate:
+                            checknumber += 1
+                            errormsg += "\nThe Equipment is not available at this time!"
+                            return add(request, errormsg)
+                        elif sDT >= e.date and sDT <= e.enddate and eDT >= e.enddate:
+                            checknumber += 1
+                            errormsg += "\nThe Equipment is not available at this time!"
+                            return add(request, errormsg)
+                        elif sDT <= e.date and eDT >= e.date and eDT <= e.enddate:
+                            checknumber += 1
+                            errormsg += "\nThe Equipment is not available at this time!"
+                            return add(request, errormsg)
+                        elif sDT <= e.date and eDT >= e.enddate:
+                            checknumber += 1
+                            errormsg += "\nThe Equipment is not available at this time!"
+                            return add(request, errormsg)
+                
+                for equipm in Equipment.objects.raw('SELECT * FROM ecalendar_equipment'):
+                    if equipm.id == i:
+                        if equipm.enabled == False:
+                            checknumber += 1
+                            errormsg+="\nThe Equipment is not available!"
+                            return add(request,errormsg)
 
 #            when the errorcounter is more than 0 the Reservation is not available
             if checknumber > 0:
                 return add(request,errormsg)
             else:
-                print"Now the db input"
-                print request.session['user_ID']
-                eqEn=Equipment.objects.get(id=Eid)
-                usEn=User.objects.get(id=request.session['user_ID'])
-                print eqEn
-                print usEn
-                eNew= Entry(
-                    equipment = eqEn,
-                    title = Entrytitle,
-                    body = Entryinfo,
-                    date = sDT,
-                    enddate = eDT,
-                    creator = usEn
-                )
-                eNew.save()
-                Entrydate1
-                b=Entrydate1.split("-")
-                year = b[0]
-                month = b[1]
-                print year
-                print month
+                for i in myEquipList:
+                    print"Now the db input"
+                    print"Equip No"
+                    print i
+                    print request.session['user_ID']
+                    eqEn=Equipment.objects.get(id=i)
+                    usEn=User.objects.get(id=request.session['user_ID'])
+                    print eqEn
+                    print usEn
+                    eNew= Entry(
+                        equipment = eqEn,
+                        title = Entrytitle,
+                        body = Entryinfo,
+                        date = sDT,
+                        enddate = eDT,
+                        creator = usEn
+                    )
+                    eNew.save()
+                    Entrydate1
+                    b=Entrydate1.split("-")
+                    year = b[0]
+                    month = b[1]
+                    print year
+                    print month
             return render_to_response('ecalendar/input.html',{'context':context,'year':year,'month':month})
         else:
             return render_to_response('ecalendar/new.html',{'context':context})
@@ -504,16 +599,23 @@ def changeadd(request):
             Entrydate2 = request.POST['enddate_0']
             Entrytime1 = request.POST['date_1']
             Entrytime2 = request.POST['enddate_1']
-            regex = re.compile("\A[0-2]\d:[0-5]\d:[0-5]\d\Z")
+            regex2 = re.compile("\A[0-2]\d:[0-5]\d$")
+            regex = re.compile("\A[0-2]\d:[0-5]\d:[0-5]\d\Z$")
+
+            if regex2.search(Entrytime1):
+                Entrytime1+=":00"
+            if regex2.search(Entrytime2):
+                Entrytime2+=":00"
+
 
 #            inputcheck
             inputcheck=0
             if Eid =="" :
                 inputcheck += 1
                 errormsg+="\nThe equipment ID is missing !"
-            if Entrytitle =="" :
-                inputcheck += 1
-                errormsg+="\nThe title is missing !"
+#            if Entrytitle =="" :
+#                inputcheck += 1
+#                errormsg+="\nThe title is missing !"
             if Entrydate1 =="" :
                 inputcheck += 1
                 errormsg+="\nThe start date is missing !"
@@ -626,3 +728,38 @@ def delete(request):
             return render_to_response('ecalendar/new.html',{'context':context})
     else:
           return render_to_response('ecalendar/new.html',{'context':context})
+
+def ajax_search_equip(request):
+    if request.is_ajax():
+       if request.method == 'POST':
+            post = request.POST.copy()
+            if post.has_key('name') :
+                print 'Raw Data: "%s"' % request.raw_post_data
+                equipment = []
+                eName = post['name']
+                print eName
+                print "AJAX POOST"
+
+                equipment = Equipment.objects.filter(name__contains=eName)
+                print equipment
+                for e in equipment:
+                    print e.name
+
+                json =serializers.serialize('json', equipment, ensure_ascii=False)
+                return HttpResponse(json, mimetype="application/json")
+
+    else:
+      entries.append("NO AJAX")
+
+    return HttpResponse()
+
+#                another opinion to search
+#                a = Equipment.objects.all()
+#                regex=re.compile("\w*%s\w*" % name)
+#                for en in a:
+#                    nameEq = en.name
+#                    r = regex.search(nameEq)
+#                    if r:
+#                        check = Equipment.objects.get(id=en.id)
+#                        equipment.append(check)
+#                equipment=name
