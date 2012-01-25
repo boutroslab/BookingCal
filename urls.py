@@ -5,11 +5,13 @@ from bookingCal import settings
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    (r'^$', 'bookingCal.views.index'),
+    (r'^booking/$', 'bookingCal.views.index'),
     #(r'^admin/', include('django.contrib.admin.urls')) , 
-    (r'^admin/', include(admin.site.urls)),
-    (r'^kalendar/', include('ecalendar.urls')),
-    (r'^static/(?P<path>.*)$', 'django.views.static.serve',
-    {'document_root':     settings.MEDIA_ROOT}),
-
+    (r'^booking/admin/', include(admin.site.urls)),
+    (r'^booking/kalendar/', include('ecalendar.urls')),
+    (r'^booking/kalendar/', include('ecalendar.urls')),               
+    (r'^booking/equipment/', 'bookingCal.views.equip'),
+# (r'^static/(?P<path>.*)$', 'serve'),
+    (r'^booking/static/(?P<path>.*)$', 'django.views.static.serve',
+            {'document_root':    '/var/www/django/django_projects/bookingCal/static'}),
 )

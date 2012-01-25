@@ -8,6 +8,7 @@ body {
     font-size: 12px;
     font-family: "Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
     color: #333;
+    background: #fff;
 }
 
 /* LINKS */
@@ -509,7 +510,7 @@ div.system-message {
 div.system-message p.system-message-title {
     padding: 4px 5px 4px 25px;
     margin: 0;
-    color: #ff0000;
+    color: red;
     background: #ffc url(../img/admin/icon_error.gif) 5px .3em no-repeat;
 }
 
@@ -528,10 +529,6 @@ div.breadcrumbs {
     border-top: 1px solid white;
     border-bottom: 1px solid #ccc;
     text-align: left;
-}
-
-div.breadcrumbs a{
-    margin-right:10px;
 }
 
 /* ACTION ICONS */
@@ -739,11 +736,8 @@ table#change-history tbody th {
     top: 0;
     right: 0;
     padding: 1.2em 10px;
-    font-size: 12px;
+    font-size: 11px;
     text-align: right;
-}
-#user-tools a{
-    font-size:14px;
 }
 
 /* SIDEBAR */
@@ -763,28 +757,3 @@ table#change-history tbody th {
     color: #666;
 }
 
-
-.menu {
-    background: #eee url(../img/admin/nav-bg.gif) bottom left repeat-x;
-    padding-left:20px;
-    font-size: 16px;
-    font-weight: normal;
-
-    cloat:left;
-}
-.menu li{
-    color: #666666;
-    float:left;
-    list-style: none;
-}
-.menu a:active,.menu a:visited, .menu a{
-    margin-right: 10px;
-    color: #666666;
-    font-style: normal;
-    font-variant: normal;
-    text-decoration: none;
-    text-transform: capitalize;
-}
-.menu a:hover{
-    font-weight: bolder;
-}

@@ -644,13 +644,13 @@ ul.timelist, .timelist li {
 }
 .equipOverlay{
     position: absolute;
-    z-index:199;
+    z-index:196;
     left: 340px;
     margin-top: -20px;
     visibility: hidden;
     background: white 0 100% repeat-x;
     border: 1px solid #ccc;
-  
+
 }
 .equipOverlay td{
     padding: 2px;
@@ -661,6 +661,83 @@ ul.timelist, .timelist li {
     font-size: +2;
     text-align: left;
 }
+.equipOverlay2{
+    position: absolute;
+    z-index:197;
+    left: 340px;
+    margin-top: -20px;
+    visibility: hidden;
+    background: white 0 100% repeat-x;
+    border: 1px solid #ccc;
+
+}
+.equipOverlay2 td{
+    padding: 2px;
+
+}
+.equipOverlay2 th{
+    padding: 5px;
+    font-size: +2;
+    text-align: left;
+}
+.equipOverlay3{
+    position: absolute;
+    z-index:198;
+    left: 340px;
+    margin-top: -20px;
+    visibility: hidden;
+    background: white 0 100% repeat-x;
+    border: 1px solid #ccc;
+
+}
+.equipOverlay3 td{
+    padding: 2px;
+
+}
+.equipOverlay3 th{
+    padding: 5px;
+    font-size: +2;
+    text-align: left;
+}
+.equipOverlay4{
+    position: absolute;
+    z-index:199;
+    left: 340px;
+    margin-top: -20px;
+    visibility: hidden;
+    background: white 0 100% repeat-x;
+    border: 1px solid #ccc;
+
+}
+.equipOverlay4 td{
+    padding: 2px;
+
+}
+.equipOverlay4 th{
+    padding: 5px;
+    font-size: +2;
+    text-align: left;
+}
+
+.equipSearch{
+    position: absolute;
+    z-index:196;
+    left: 340px;
+    margin-top: -20px;
+    visibility: hidden;
+    background: white 0 100% repeat-x;
+    border: 1px solid #ccc;
+}
+.equipSearch td{
+    padding: 2px;
+}
+.equipSearch th{
+    padding: 5px;
+    font-size: +2;
+    text-align: left;
+}
+
+
 .back {
     border:2px ridge #000000;
     -moz-border-radius:5px;
@@ -685,6 +762,7 @@ ul.timelist, .timelist li {
     color: #000000;
     font-size: small;
 }
+
 .entryTD {
     padding: 5PX;
     font-weight: bold;
@@ -695,6 +773,12 @@ ul.timelist, .timelist li {
     font-weight: bold;
 
 }
+.entrySearch{
+    background-color: #e1e1e1;
+    color: #000000;
+    font-size: small;
+}
+
 .entryCancel{
     background-color: #e1e1e1;
     color: #aaaaaa;
@@ -702,4 +786,32 @@ ul.timelist, .timelist li {
     text-align: center;
     padding: 0px;
     height: 10px;
+}
+.errorBackButton{
+    border:2px ridge #cc0000;
+    -moz-border-radius:5px;
+    padding:5px;
+    text-decoration:none;
+    color:#000000;
+    font-weight:bolder;
+    border-radius: 5px 5px 5px 5px;
+}
+.errorBackButton:hover{ border-style:solid; }
+
+.equipHead{
+    background-color: #417690;
+    color: #ffffff;
+    font-size: 17px;
+    border-right-style: inset;
+    border-left-style: inset;
+    border-bottom-style: inset;
+    border-top-style: inset;
+    border-right-width: 1px;
+    border-left-width: 1px;
+    border-bottom-width: 1px;
+    border-top-width: 1px;
+}
+.equipHead th{
+    padding: 5px;
+    min-width: 50px;
 }

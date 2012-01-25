@@ -1,8 +1,28 @@
 ## Django settings for helloWorld project.
+import os
+import sys
+import logging
+# put the Django project on sys.path
+path = '/var/www/django/django_projects/bookingCal'
+if path not in sys.path:
+    sys.path.append(path)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'bookingCal.settings'
 
+
+
+#import django.core.handlers.wsgi
+#application = django.core.handlers.wsgi.WSGIHandler()
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+
+logging.basicConfig( 
+    filename="/var/www/django/info.log",
+    filemode="a",
+    level = logging.DEBUG,
+    format= '%(asctime)s %(levelname)s %(message)s',
+)
+
 
 ADMINS = (
            ('Yannic', 'your_email@domain.com'),
@@ -12,11 +32,11 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'booking', # Or path to database file if using sqlite3.
+        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'buchung_django', # Or path to database file if using sqlite3.
         'USER': 'django', # Not used with sqlite3.
         'PASSWORD': '!dj4n6o', # Not used with sqlite3.
-        'HOST': 'localhost', # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': 'b110-dbserve', # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '', # Set to empty string for default. Not used with sqlite3.
     }
 }
@@ -36,7 +56,8 @@ TIME_ZONE = 'Europe/Berlin'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+#LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'de'
 
 SITE_ID = 1
 
@@ -50,8 +71,8 @@ USE_L10N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-#MEDIA_ROOT = '/var/www/django/django_projects/bookingCal/static'
-MEDIA_ROOT='/Users/Yannic/PycharmProjects/bookingCal/static/'
+MEDIA_ROOT ='/var/www/django/django_projects/bookingCal/static'
+#MEDIA_ROOT='/Users/Yannic/PycharmProjects/bookingCal/static/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -62,7 +83,7 @@ MEDIA_ROOT='/Users/Yannic/PycharmProjects/bookingCal/static/'
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
 
-#ADMIN_MEDIA_PREFIX = '/var/www/django/admin_media/'
+#ADMIN_MEDIA_PREFIX = '/var/www/django/django_projects/bookingCal/static'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'eu_2&go98qy@ad&(g^!hggtt=i#+hjg48*-u$)0)+a-8!6c=b-'
@@ -88,7 +109,8 @@ TEMPLATE_DIRS = (
                  # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
                  # Always use forward slashes, even on Windows.
                  # Don't forget to use absolute paths, not relative paths.
-                 'templates'
+                 '/var/www/django/django_templates'
+                 #'templates'
                  )
 
 INSTALLED_APPS = (
