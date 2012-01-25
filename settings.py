@@ -1,4 +1,4 @@
-## Django settings for helloWorld project.
+## Django settings for bookingCal project.
 import os
 import sys
 import logging
@@ -25,7 +25,7 @@ logging.basicConfig(
 
 
 ADMINS = (
-           ('Yannic', 'your_email@domain.com'),
+           ('B110-IT', 'b110-it@dkfz.de'),
           )
 
 MANAGERS = ADMINS
@@ -109,7 +109,7 @@ TEMPLATE_DIRS = (
                  # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
                  # Always use forward slashes, even on Windows.
                  # Don't forget to use absolute paths, not relative paths.
-                 '/var/www/django/django_templates'
+                 '/var/www/django/django_projects/bookingCal/templates'
                  #'templates'
                  )
 
