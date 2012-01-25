@@ -45,7 +45,7 @@
 <a class="back" href="javascript:history.back()" > &lt;&lt; back </a>
 
 {% if entries %}
-<h2> {{ entries.title }}</h2>
+<h2>Reservation</h2>
 <div class="entry">
     <div id="inp1" >
         <table>
@@ -63,7 +63,7 @@
             </tr>
             <tr>
                 <td><b>Creator:</b></td>
-                <td>{{ entries.creator }}</td>
+                <td>{{ entries.creator.first_name }} {{ entries.creator.last_name }}</td>
             </tr>
             <tr>
                 <td valign="top"><b>Information:</b></td>

@@ -3,6 +3,8 @@
 {% block title %}Kalendar{% endblock %}
 
 {% block content %}
+<!--  <script type="text/javascript" src="/static/main/js/jquery-1.5.1.min.js"></script>
+-->
 <style type="text/css">
     h1{  margin-left:350px;}
     .current {
@@ -37,10 +39,9 @@
             </td>
             <td >
 
-                <input type="text" value="Search..." size="15" name="equipment_name" id="id_equipment_name" disabled />
+                <input type="text" value="{{ equipmentName }}" onkeyup="searchEquip(this.value,{{ year }},{{ month }})" size="15" name="equipment_name" id="id_equipment_name"  />
                 <a href="javascript:showEquiptments()" class="related-lookup" id="lookup_id_equipment">
                     <img src="/static/admin/img/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>
-
 
                 <div class="equipOverlay" id="overLay">
                     <table>
@@ -51,31 +52,28 @@
                             <th>Name</th>
                             <th>Room</th>
                             <th>Description</th>
-
                         </tr>
-
                         {% for entry in equipment %}
-
                         <tr id="entryTD" class="entryTD" onMouseOver="setEquiptment({{ entry.id }},'{{ entry.name }}')" onclick="clickEquiptment({{ year }},{{ month }},{{ entry.id }})" style="cursor:pointer">
                             <td>{{ entry.name }}</td>
                             <td>{{ entry.room }}</td>
                             <td>{{ entry.desc }}</td>
                         </tr>
-
                         {% empty %}
                         <tr>
                             <td colspan="3">no Entry   </td>
                         </tr>
-
                         {% endfor %}
                         <tr class="entryCancel"  >
                             <td colspan="3" onclick="cancelOverlay()" ><b style="cursor:pointer">Cancel</b></td>
                         </tr>
-                        <input type="hidden" name="equipment" id="id_equipment" />
-
                     </table>
-
                 </div>
+                <div class="equipSearch" id="equipSearch">
+                    <!--                    Suchergebnisse-->
+                    
+                </div>
+
             </td>
         </tr>
     </table>
@@ -126,6 +124,7 @@
         </table>
 
         <div class="clear"></div>
+        <div id="ajax"></div>
     </div>
 </div>
 <script language="JavaScript"
@@ -133,12 +132,12 @@
             <!--
             function showEquiptments() {
                 document.getElementById("overLay").style.visibility = "visible";
+                document.getElementById("equipSearch").style.visibility = "hidden";
 
             }
             function setEquiptment(id,name){
-                document.getElementById("id_equipment").value=id;
                 //                document.getElementById("overLay").style.visibility = "hidden";
-		document.getElementById("id_equipment_name").value=name;
+                document.getElementById("id_equipment_name").value=name;
             }
             function clickEquiptment(year,month,id){
 
@@ -152,10 +151,62 @@
 
                 document.location.href=hreflink;
                 document.getElementById("overLay").style.visibility = "hidden";
+                document.getElementById("equipSearch").style.visibility = "hidden";
             }
             function cancelOverlay(){
                 document.getElementById("overLay").style.visibility = "hidden";
+                document.getElementById("equipSearch").style.visibility = "hidden";
             }
+
+
+            function searchEquip(str,year,month) {
+                document.getElementById("overLay").style.visibility = "hidden";
+                document.getElementById("equipSearch").style.visibility = "visible";
+                //var dataIn = ${ 'name': str }.serializeArray();
+		var dataIn=(str);
+		// alert(dataIn);
+
+//var args= { type:'POST', url:'/kalendar/ajax_search_equip/', data:'t', success:function(data) {   alert('test'); }};
+var args= { type:'POST', url:'/kalendar/ajax_search_equip/', data:dataIn,   cache: false,dataType: "json",timeout: 5000, success:function(data) {                                                                                                             
+                        alert("endlich");                                                                                                                                                                                                                                     
+                        $('#equipSearch').empty();                                                                                                                                                                                                                            
+                        var html= '<table><tr class="entryHead"><td colspan="3"><b>Choose a Equipment</b></td></tr><tr class="entryUnderHead"><th>Name</th><th>Room</th><th>Description</th></tr>';                                                                           
+                        if (data.length>0){                                                                                                                                                                                                                                   
+                            $.each(data,function(entryIndex, entry){                                                                                                                                                                                                          
+                               html +='<tr id="entryTD" class="entryTD" onMouseOver="setEquiptment(';                                                                                                                                                                         
+                               html+=entry['pk'];                                                                                                                                                                                                                             
+                               html+=',';                                                                                                                                                                                                                                     
+                               html+=entry.fields['name'];                                                                                                                                                                                                                    
+                               html+=')" ';                                                                                                                                                                                                                                   
+                               html+='onclick="clickEquiptment(';                                                                                                                                                                                                             
+                               html+= year;                                                                                                                                                                                                                                   
+                               html+=',';                                                                                                                                                                                                                                     
+                               html+=month;                                                                                                                                                                                                                                   
+                               html+=',';                                                                                                                                                                                                                                     
+                               html+=entry['pk'];                                                                                                                                                                                                                             
+                               html+=')" style="cursor:pointer">';                                                                                                                                                                                                            
+                               html+='<td>';                                                                                                                                                                                                                                  
+                               html+=entry.fields['name'];                                                                                                                                                                                                                    
+                               html+='</td>';                                                                                                                                                                                                                                 
+                               html+="<td>";                                                                                                                                                                                                                                  
+                               html+=entry.fields['room'];                                                                                                                                                                                                                    
+                               html+='</td>';                                                                                                                                                                                                                                 
+                               html+='<td>';                                                                                                                                                                                                                                  
+                               html+=entry.fields['desc'];                                                                                                                                                                                                                    
+                               html+='</td></tr>';                                                                                                                                                                                                                            
+                             alert(html);                                                                                                                                                                                                                                     
+                             });                                                                                                                                                                                                                                              
+                        }else{                                                                                                                                                                                                                                                
+                            html+='<tr class="entryTD" class="entryTD" ><td colspan="3"><center><b>No Equipment found</b></center></td></tr>';                                                                                                                                
+                        }                                                                                                                                                                                                                                                     
+                        html +='<tr class="entryCancel"><td colspan="3" onclick="cancelOverlay()" ><b style="cursor:pointer">Cancel</b></td></tr>';                                                                                                                           
+                        $('#equipSearch').append(html);                                                                                                                                                                                                                       
+                    }};                                                                                                                                                                                                                                                       
+                            
+		  $.ajax(args);
+            }
+
             // -->
 </script>
 {% endblock %}
+

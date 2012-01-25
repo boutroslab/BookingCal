@@ -131,7 +131,7 @@
                 <fieldset class="module aligned ">
                     <h2>Informations</h2>
 
-                    <div class="form-row title">
+                    <div style="visibility: hidden;">
                         <div>
                             <label for="id_title" class="required">Title:</label>
                             <input id="id_title" type="text"name="title" maxlength="40" value="{{ entries.title }}" />
@@ -147,9 +147,9 @@
                 <div class="submit-row" >
                     <input type="submit" value="Complete the Reservation" class="submit" name="_save" />
                     </form>
-                    <form action="/kalendar/delete/" method="post" id="delete_form" onsubmit="return confirmSubmit()">{% csrf_token %}
+                    <form action="/kalendar/delete/" method="post" id="delete_form" onsubmit="return show_confirm()">{% csrf_token %}
                         <input type='hidden' name='entry' value="{{ entries.id }}" />
-                        <input type="submit" value="Delete the Reservation" class="deletelink" name="_delete" />
+                        <input type="submit" value="Delete the Reservation"  class="deletelink" name="_delete" />
 
 
                     </form>
@@ -163,17 +163,30 @@
     {%  endif %}
     <script language="JavaScript"
             type="text/javascript">
-            <!--                                                                                                                                                                        
-            function showEquiptments() {                                                                                                                                                
-                document.getElementById("overLay").style.visibility = "visible";                                                                                                        
+                <!--
+                function showEquiptments() {
+                    document.getElementById("overLay").style.visibility = "visible";
                                                                                                                                                                                         
-            }                                                                                                                                                                           
-            function setEquiptment(id,name){                                                                                                                                            
-                document.getElementById("id_equipment").value=id;                                                                                                                       
-                document.getElementById("overLay").style.visibility = "hidden";                                                                                                         
-                document.getElementById("id_equipment_name").value=name;                                                                                                                
-            }                                                                                                                                                                           
-            // -->
+                }
+                function setEquiptment(id,name){
+                    document.getElementById("id_equipment").value=id;
+                    document.getElementById("overLay").style.visibility = "hidden";
+                    document.getElementById("id_equipment_name").value=name;
+                }
+                function show_confirm()
+                {
+                    var r=confirm("Are you sure to delete this Reservation?");
+                    if (r==true)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+
+                    }
+                }
+                // -->
     </script>
 
     <!-- END Content -->

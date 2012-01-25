@@ -4,25 +4,31 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <link href="/static/main/css/baseMain.css" rel="stylesheet" type="text/css">
+        <link href="/booking/static/main/css/baseMain.css" rel="stylesheet" type="text/css">
+       <link href="/booking/static/admin/css/base.css" rel="stylesheet" type="text/css">
+
+        <script type="text/javascript" src="/booking/static/main/js/jquery-1.5.1.min.js"></script>
+
             <title>{% block title %} {% endblock %}</title>
     </head>
     <body>
+
         <div id="container">
             <div id="header">
                 <h1 >B110 Booking Software</h1>
             </div>
 
             <div class="menu">
-                <a href="/">Home </a>
-                <a href="/kalendar">Calendar</a>
+                <a href="/booking/">Home </a>
+                <a href="/booking/kalendar/">Calendar</a>
+                 <a href="/booking/equipment/">Equipment</a>
                 {% if context %}
-                <a href="/kalendar/new">Add Entry</a>
-                <a class="hidden" href="/kalendar/history">Your History </a> &nbsp;
-                <a class="hidden" href="/kalendar/logout">Logout </a>
+                <a href="/booking/kalendar/new">Add Entry</a>
+                <a class="hidden" href="/booking/kalendar/history">Your History </a> &nbsp;
+                <a class="hidden" href="/booking/kalendar/logout">Logout </a>
 
                 {% else %}
-                <a href="/kalendar/new">Login</a>
+                <a href="/booking/kalendar/new">Login</a>
                 {% endif %}
 
                 {% block menu %} {% endblock %}

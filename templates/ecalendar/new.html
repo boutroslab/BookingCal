@@ -1,37 +1,35 @@
 {% extends "base.html" %}
-
 {% block title %}Kalendar{% endblock %}
-
 {% block content %}
 <style type="text/css">
     h1{  margin-left:270px;}
     .tab {margin:30px;}
-    .month { width: 80px; float: left;margin: 2px; padding: 3px;
-             border:2px ridge #000000; -moz-border-radius:5px; padding:5px; text-decoration:none; color:#000000;}
-    .month:hover{ border-style:solid; }
-    .month a { text-decoration: none; margin: 4px; color:#000000;}
-    .month a:visited {text-decoration: none; margin: 4px; color:#000000; }
     .clear { clear: both; }
-    .current {width: 80px; float: left; margin: 2px; padding: 3px; background: #eeeec8;
-              border:2px ridge #000000; -moz-border-radius:5px; padding:5px; text-decoration:none; color:#000000; font-weight:bolder;}
-    .current a { text-decoration: none; margin: 4px; color:#000000; }
-    .current a:visited {text-decoration: none; margin: 4px; color:#000000; }
-    .current:hover{ border-style:solid; }
+
 </style>
 <div class="tab">
-
-
-  
     <h3>Login</h3>
-    <form action="/kalendar/new/check/" method="post" accept-charset="utf-8">{% csrf_token %}
-        <label for="username">Username</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <input type="text" name="username" value="" id="username" /><br />
-        <label for="password">Password</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <input type="password" name="password" value="" id="password" />
+    <form action="/booking/kalendar/new/check/" method="post" accept-charset="utf-8">{% csrf_token %}
+        <table>
+            <tr>
+                <td width="100px">
+                    <label for="username">Username</label>
+                </td>
+                <td>
+                    <input type="text" name="username" value="" id="username" /><br />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="password">Password</label>
+                </td>
+                <td>
+                    <input type="password" name="password" value="" id="password" />
+                </td>
+            </tr>
+        </table>
         <p><input type="submit" value="Login ->" /></p>
     </form>
+    <a href="/kalendar/guest">Guest login</a>
 </div>
-
-
-
 {% endblock %}
