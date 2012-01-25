@@ -1,0 +1,72 @@
+
+{% extends "base.html" %}
+{% block title %}Index{% endblock %}
+
+{% block content %}
+
+<style type="text/css">
+    .equipTR1 {
+        text-align: left;
+        font-size: 13px;
+        background-color: white;
+    }
+    .equipTR1 td{
+        padding: 5px;
+        border-right-style: inset;
+        border-left-style: inset;
+        border-bottom-style: inset;
+        border-top-style: inset;
+        border-right-width: 1px;
+        border-left-width: 1px;
+        border-bottom-width: 1px;
+        border-top-width: 1px;
+    }
+    .equipTR2 {
+        text-align: left;
+        font-size: 13px;
+        background-color: gainsboro;
+    }
+    .equipTR2 td{
+        padding: 5px;
+        border-right-style: inset;
+        border-left-style: inset;
+        border-bottom-style: inset;
+        border-top-style: inset;
+        border-right-width: 1px;
+        border-left-width: 1px;
+        border-bottom-width: 1px;
+        border-top-width: 1px;
+    }
+
+</style>
+<h1>Equipments</h1>
+<br />
+<table>
+    <tr class="equipHead">
+        <th>Name</th>
+        <th>Room</th>
+        <th>Person</th>
+        <th>Description</th>
+
+    </tr>
+
+    {% for entry in entries %}
+
+    <tr class="{% cycle 'equipTR1' 'equipTR2' %}" >
+        <td>{{ entry.name }}</td>
+        <td>{{ entry.room }}</td>
+        <td>{{ entry.person }}</td>
+        <td>{{ entry.desc }}</td>
+    </tr>
+
+    {% empty %}
+    <tr>
+        <td colspan="3">no Equipments   </td>
+    </tr>
+    {% endfor %}
+</table>
+
+
+
+{% endblock %}
+
