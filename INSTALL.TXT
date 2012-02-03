@@ -87,13 +87,14 @@ for FILE in *.py; do mv $FILE $FILE.old; done
 
 #now copy bookingcal stuff, go to temp or root dir
 cd 
-svn checkout http://b110-devserver/svn/bookingCalPython
+svn checkout http://b110-devserver/svn/bookingCalPhyton
 cd bookingCalPython
 sudo cp *.py /var/www/django/django_projects/bookingCal
 sudo cp -r ecalendar static templates /var/www/django/django_projects/bookingCal   
 sudo touch /var/www/django/info.log
 sudo chmod 777 /var/www/django/info.log
 # i dont know yet if this is necessary : django-admin.py syncdb
+#maybe now you need to copy over the websrv db etc.
 
 
 

@@ -71,7 +71,7 @@ USE_L10N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT ='/var/www/django/django_projects/bookingCal/static'
+MEDIA_ROOT =path+ '/static'
 #MEDIA_ROOT='/Users/Yannic/PycharmProjects/bookingCal/static/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
