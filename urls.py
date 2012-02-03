@@ -6,11 +6,12 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^booking/$', 'bookingCal.views.index'),
-    #(r'^admin/', include('django.contrib.admin.urls')) , 
     (r'^admin/', include(admin.site.urls)),
-    (r'^kalendar/', include('ecalendar.urls')),
-    (r'^equipment/', 'bookingCal.views.equip'),
-    (r'^static/(?P<path>.*)$', 'django.views.static.serve',
+    (r'^booking/admin/', include(admin.site.urls)),
+    (r'^booking/kalendar/', include('ecalendar.urls')),
+    (r'^booking/equipment/', 'bookingCal.views.equip'),
+    (r'^booking/static/(?P<path>.*)$', 'django.views.static.serve',
     {'document_root':     settings.MEDIA_ROOT}),
 
 )
+
