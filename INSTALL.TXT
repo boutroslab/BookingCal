@@ -2,10 +2,10 @@
 # install guest additions...before installing you have to get linux src code in order to work
 sudo apt-get install build-essential linux-headers-`uname -r`
 
-#install booking calendar on ubuntu hardy
-#change hostname to b110-webserver
+#install booking calendar on ubuntu hardy in a virtual box environment...
+#change hostname to b110-webserver (dont need this if you want to deploy on b110-websrv)
 >sudo vi /etc/hostname
-#change hostname to b110-webserver
+#change hostname to b110-webserver (dont need this if want to deploy on b110-websrv)
 sudo vi /etc/hosts
 # update sys
 > sudo apt-get update
