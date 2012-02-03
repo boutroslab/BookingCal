@@ -14,14 +14,17 @@ sudo vi /etc/hosts
 sudo apt-get install python-setuptools python-dev build-essential mysql-server python-mysqldb python-ldap
 sudo easy_install pip
 sudo pip install --upgrade virtualenv
+sudo pip install django
 sudo apt-get install apache2-threaded-dev 
-download  http://code.google.com/p/modwsgi/downloads/detail?name=mod_wsgi-3.3.tar.gz
+download  latest http://code.google.com/p/modwsgi/
+#e.g.
+wget http://modwsgi.googlecode.com/files/mod_wsgi-3.3.tar.gz
 tar xzf mod_wsgi-2.6.tar.gz
 cd mod_wsgi-3.3
 ./configure --with-python=/usr/bin/python2.5
 make
 sudo make install
-sudo vi /etc/apache2/mods-available/  
+sudo emacs /etc/apache2/mods-available/wsgi.load 
 #put in the following line in that file:
 LoadModule wsgi_module /usr/lib/apache2/modules/mod_wsgi.so
 #save and exit
@@ -53,6 +56,8 @@ application = django.core.handlers.wsgi.WSGIHandler()
 -----
 
 sudo nano /etc/apache2/sites-available/bookingCal
+
+#please change server name e.g. on  b110-websrv use "<VirtualHost b110-websrv:80>"
 -----
 <VirtualHost b110-webserver:80>
  
@@ -75,12 +80,12 @@ sudo a2ensite bookingCal
 sudo /etc/init.d/apache2 reload
 cd /var/www/django/django_projects/bookingCal
 python manage.py runserver 0:8080
-#test in webbrowser: http://0:8080
+#test in webbrowser: http://0:8080  or http://b110-websrv:8080
 ctrl+c django server
-#in /var/www/django/django_projects/bookingCal do a :
+#in /var/www/django/django_projects/bookingCal make a backup of all old files, do a :
 for FILE in *.py; do mv $FILE $FILE.old; done
 
-#now copy bookingcal stuff
+#now copy bookingcal stuff, go to temp or root dir
 cd 
 svn checkout http://b110-devserver/svn/bookingCalPython
 cd bookingCalPython
@@ -89,3 +94,12 @@ sudo cp -r ecalendar static templates /var/www/django/django_projects/bookingCal
 sudo touch /var/www/django/info.log
 sudo chmod 777 /var/www/django/info.log
 # i dont know yet if this is necessary : django-admin.py syncdb
+
+
+
+#Main sources for this instruction:
+#http://blog.stannard.net.au/2010/12/11/installing-django-with-apache-and-mod_wsgi-on-ubuntu-10-04/
+#http://grok.zope.org/documentation/tutorial/installing-and-setting-up-grok-under-mod-wsgi/installing-and-configuring-mod-wsgi
+#http://www.saltycrane.com/blog/2010/02/how-install-pip-ubuntu/
+# some forum threads and newsgroup entries
+
