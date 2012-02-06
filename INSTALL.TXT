@@ -59,22 +59,26 @@ sudo nano /etc/apache2/sites-available/bookingCal
 
 #please change server name e.g. on  b110-websrv use "<VirtualHost b110-websrv:80>"
 -----
-<VirtualHost b110-webserver:80>
- 
-    ServerName bookingCal.djangoserver
+Listen 8080
+NameVirtualHost *:8080
+<VirtualHost *:8080>
+
+    ServerName b110-websrv
     DocumentRoot /var/www/django/django_projects/bookingCal
- 
+
     <Directory /var/www/django/django_projects/bookingCal>
         Order allow,deny
         Allow from all
     </Directory>
- 
-    WSGIDaemonProcess bookingCal.djangoserver processes=2 threads=15 display-name=%{GROUP}
-    WSGIProcessGroup bookingCal.djangoserver
- 
+
+    WSGIDaemonProcess b110-websrv processes=2 threads=15 display-name=%{GROUP}
+    WSGIProcessGroup b110-websrv
+
     WSGIScriptAlias / /var/www/django/django_projects/bookingCal/apache/django.wsgi
- 
+
 </VirtualHost>
+
+
 -----
 sudo a2ensite bookingCal
 sudo /etc/init.d/apache2 reload
