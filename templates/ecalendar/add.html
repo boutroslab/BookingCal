@@ -31,7 +31,31 @@
 <script type="text/javascript" src="/booking/static/admin/js/actions.min.js"></script>
 <script type="text/javascript" src="/booking/static/admin/js/calendar.js"></script>
 <script type="text/javascript" src="/booking/static/admin/js/admin/DateTimeShortcuts.js"></script>
+<script type="text/javascript">
 
+	function loseFocus()
+	{ 
+		document.getElementById("id_date_0").blur();
+		document.getElementById("id_enddate_0").blur();
+	}
+	function switchTime(frm)
+	{
+		if(frm.date_1.value > "24:00")
+			alert("The Day has only 24 hours!")
+		else if(frm.date_1.value == "24:00")
+			frm.date_1.value = "00:00"
+
+		if(frm.enddate_1.value > "24:00")
+			alert("The Day has only 24 hours!")
+		else if(frm.enddate_1.value == "24:00")
+                        frm.enddate_1.value = "00:00"
+	}
+	function checkDate(frm)
+	{
+		if(frm.date_0.value == "2012-04-10")
+			alert("Das war schon!")
+	}
+</script>
 <div id="content">
 
     <h1>Add entry</h1>
@@ -101,7 +125,7 @@
                                 </table>
 
                             </div>
-                            <input type="hidden" name="equipment" id="id_equipment" />
+                            <input type="text" name="equipment" id="id_equipment" />
                         </div>
                     </div>
                                     </fieldset>
@@ -110,17 +134,17 @@
                     <div class="form-row date">
                         <div>
                             <label for="id_date_0" class="required">Date:</label>
-                            <p class="datetime">Date: <input name="date_0" class="vDateField" id="id_date_0" size="10" type="text" readonly>
+                            <p class="datetime">Date: <input name="date_0" class="vDateField" id="id_date_0" size="10" style="background:#F0F0F0" type="text" onchange="checkDate(this.form)" onclick="loseFocus()">
 
-                                <br>Time: <input name="date_1" id="id_date_1" class="vTimeField"  size="8" type="text" /> example: 12:00</p>
+                                <br>Time: <input name="date_1" id="id_date_1" class="vTimeField"  size="8" type="text" onblur="switchTime(this.form)" /> example: 09:00 or 21:00</p>
                         </div>
                     </div>
                     <div class="form-row enddate">
                         <div>
                             <label for="id_enddate_0" class="required">Enddate:</label>
-                            <p class="datetime">Date: <input id="id_enddate_0" class="vDateField" name="enddate_0" size="10" type="text" readonly>
+                            <p class="datetime">Date: <input id="id_enddate_0" class="vDateField" name="enddate_0" size="10" style="background:#F0F0F0" type="text" readonly onclick="loseFocus()">
 
-                                <br>Time: <input id="id_enddate_1" class="vTimeField" name="enddate_1" size="8" type="text" /> example: 12:00</p>
+                                <br>Time: <input id="id_enddate_1" class="vTimeField" name="enddate_1" size="8" type="text" onblur="switchTime(this.form)" /> example: 09:00 or 21:00</p>
                         </div>
                     </div>
                 </fieldset>

@@ -27,7 +27,14 @@
     .next:hover{ border-style:solid; }
 </style>
 <br />
+<script type="text/javascript">
+function loseFocus()
+        {
+        	
+	        document.getElementById("id_equipment_name").blur();
+        }
 
+</script>
 <div class="main">
     <table>
         <tr>
@@ -37,12 +44,16 @@
             <td width="100px" align="left" >
                 <a class="next" href= "{% url ecalendar.views.month year month "next" %}">Next &gt;&gt;</a>
             </td>
-            <td >
+            <td>
+                <a class="back" href="{% url ecalendar.views.month year month %}"  id="back_id" hidden > &lt;&lt; back to month </a>
+            </td>
+            <td>
 
-                <input type="text" value="{{ equipmentName }}" onkeyup="searchEquip(this.value,{{ year }},{{ month }})" size="15" name="equipment_name" id="id_equipment_name"  />
+               Choose a Equipment:  <input type="text" value="{{ equipmentName }}" onkeyup="searchEquip(this.value,{{ year }},{{ month }})" size="15" name="equipment_name" id="id_equipment_name" onclick="loseFocus()" style="background:#F0F0F0"  />
                 <a href="javascript:showEquiptments()" class="related-lookup" id="lookup_id_equipment">
                     <img src="/static/admin/img/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>
-
+                <a href="{% url ecalendar.views.month year month %}">
+		    <img src="/static/admin/img/admin/icon_deletelink.gif"  alt="reset" /></a>
                 <div class="equipOverlay" id="overLay">
                     <table>
                         <tr class="entryHead">
@@ -64,8 +75,9 @@
                             <td colspan="3">no Entry   </td>
                         </tr>
                         {% endfor %}
+
                         <tr class="entryCancel"  >
-                            <td colspan="3" onclick="cancelOverlay()" ><b style="cursor:pointer">Cancel</b></td>
+                            <td colspan="6" onclick="cancelOverlay()" ><b style="cursor:pointer">Cancel</b></td>
                         </tr>
                     </table>
                 </div>
@@ -141,7 +153,7 @@
             }
             function clickEquiptment(year,month,id){
 
-                hreflink="/kalendar/month/"
+                hreflink="/booking/kalendar/month/"
                 hreflink=hreflink.concat(year);
                 hreflink=hreflink.concat("/");
                 hreflink=hreflink.concat(month);
@@ -153,7 +165,21 @@
                 document.getElementById("overLay").style.visibility = "hidden";
                 document.getElementById("equipSearch").style.visibility = "hidden";
             }
+	    function backCalendar(year,month,id){
+
+                hreflink="/booking/kalendar/month/"
+                hreflink=hreflink.concat(year);
+                hreflink=hreflink.concat("/");
+                hreflink=hreflink.concat(month);
+                //                alert(hreflink)
+
+                document.location.href=hreflink;
+                document.getElementById("overLay").style.visibility = "hidden";
+                document.getElementById("equipSearch").style.visibility = "hidden";
+            }
+
             function cancelOverlay(){
+		document.getElementById("id_equipment_name").value = '';
                 document.getElementById("overLay").style.visibility = "hidden";
                 document.getElementById("equipSearch").style.visibility = "hidden";
             }

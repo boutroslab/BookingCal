@@ -1,3 +1,4 @@
+import os
 import calendar
 from datetime import date
 from datetime import datetime
@@ -28,10 +29,13 @@ from django.utils import simplejson
 from django.shortcuts import render_to_response
 from django.core import serializers
 import string
+from time import gmtime, strftime
+import smtplib
+from email.MIMEText import MIMEText
 
 mnames = "January February March April May June July August September October November December"
 mnames = mnames.split()
-
+_email = ""
 def reminders(request):
     """Return the list of reminders for today and tomorrow."""
     year, month, day = time.localtime()[:3]
@@ -97,7 +101,7 @@ def month(request, year, month, change=None,eq=None):
         year, month = (now + mod).timetuple()[:2]
 
         #init variables
-    equipname="Search..."
+    equipname=""
     cal = calendar.Calendar()
     month_days = cal.itermonthdays(year, month)
     nyear, nmonth, nday = time.localtime()[:3]
@@ -163,7 +167,7 @@ def day(request, year, month, day, eq=None):
             equip=Equipment.objects.get(id="1")
             a = Entry.objects.filter(equipment=equip)
         else:
-           a = Entry.objects.all()
+           a = Entry.objects.all().order_by('equipment__name')
         entries = []
         for en in a:
             startdate = datetime(en.date.year, en.date.month, en.date.day)
@@ -192,7 +196,7 @@ def event(request, evid):
 def ldapU(request, username, password):
     c = {}
     c.update(csrf(request))
-    
+    print request 
     server_uri = 'ldap://ad.dkfz-heidelberg.de:389'
 
     # if bind_user and bind_pw is both '' it does an anonymous bind
@@ -203,7 +207,6 @@ def ldapU(request, username, password):
     filter_str = '(CN=%s)'
     searchScope = ldap.SCOPE_SUBTREE
     attrs = ['sAMAccountName', 'displayName', 'mail']
-
     adUser = username
     adPW = password
 
@@ -242,38 +245,45 @@ def ldapU(request, username, password):
                 if dn != None:
                     print 'Processing',repr(dn)
                     print entry['sAMAccountName']
+                    print entry['mail']
+                    emailad =  entry['mail']
                     fname = entry['displayName']
-                    
-                    backendAuth(username,fname)
+                    backendAuth(username,fname, emailad)
             print "Succcessfully bound - whoami says: "
         except ldap.INVALID_CREDENTIALS, err:
             print "LDAP Error: %s" % err
         
    
     print "Unbinding from directory ..."
-
     l.unbind()
     print "-" * 100
     print "\n"
 
     return ldapIn
-    
-def backendAuth(username,name):
+
+def backendAuth(username,name, mail):
     password = '123Secret'
 #    user = User.objects.get(username=username)
     print "Backend"
     print name[0]
+    name[0] = name[0].replace(",","")
+    print name[0]
     name_list = name[0].split(' ')
     lastname = name_list[0]
     firstname =name_list[1]
+    mail = mail
     
     user = authenticate(username=username, password=password)
     if user is not None:
         return
     else:
+	print "Hier kommt der Last Name:"
+        print lastname
+        lastname.replace(",","")
         user = User.objects.create_user(username, '', password)
         user.first_name = firstname
         user.last_name = lastname
+        user.email = mail[0]
         user.groups.add(1)
         user.is_active = True
         user.is_staff = False
@@ -288,7 +298,32 @@ def new(request):
     else:
         return add(request,"")
     
-
+def mail(user, startdate, enddate, starttime, endtime, eqi, type):
+    print "Mailing recipient"
+    print "the email address is"
+    print type 
+    smtp_server = 'localhost'
+    recipients = user.email
+    print recipients
+    sender = 'maximilian.koch@dkfz.de'
+    subject = 'confirmation of reservation '
+    if (type=="new"):
+        if (startdate != enddate):
+            msg_text = "Hello "+user.first_name+",\n " "you have booked "+ eqi.name +" on "+ startdate + " at "+ starttime +" to "+ enddate +" at "+ endtime+"."
+        else:
+            msg_text = "Hello "+user.first_name+",\n " "you have booked "+ eqi.name +" on "+ startdate + " at "+ starttime +" to "+ endtime+"."
+    if (type=="change"):
+        msg_text = "Geaendert"
+    if (type=="delet"):
+        msg_text = "Geloescht"
+        print "geloescht"
+    msg = MIMEText(msg_text)
+    msg['Subject'] = subject
+    s = smtplib.SMTP()
+    s.connect(smtp_server)
+    s.sendmail(sender, recipients, msg.as_string())
+    print"send"
+    s.close()
 def add(request,errormsg):
     c = {}
     c.update(csrf(request))
@@ -352,9 +387,14 @@ def check(request):
                 if ldapU(request, username=username, password=password):
 #                    backendAuth(username)
                     check = User.objects.get(username=username)
+		    print "Checkinnnng"
+		    print check.id
+		    print "EMAIL"
+                    print ldapU(request, username=username, password=password)
                     if check:
                         request.session['user_ID'] = check.id
                         request.session['ldapU_is_auth'] = True
+                        request.session['user_email'] = _email
                         return add(request,"")
                     else:
                         return new(request)
@@ -429,7 +469,7 @@ def dbadd(request):
 
             if Eid =="" :
                 inputcheck += 1
-                errormsg+="\nThe First equipment is missing !"
+                errormsg+="\nYou haven't entered any equipment !"
 
 
 #            if Entrytitle =="" :
@@ -463,9 +503,13 @@ def dbadd(request):
             
             sDT = datetime.fromtimestamp(time.mktime(time.strptime(Startdate, time_format)))
             eDT = datetime.fromtimestamp(time.mktime(time.strptime(Enddate, time_format)))
-
+            today = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+            nDT = datetime.fromtimestamp(time.mktime(time.strptime(today, time_format)))
             if sDT>eDT:
                 errormsg+="\nThe end time is before the start time !"
+                return add(request,errormsg)
+            if sDT<nDT:
+                errormsg+="\nThe start time is in the past !"
                 return add(request,errormsg)
             for i in myEquipList:
                 print"Equip No datecheck"
@@ -508,11 +552,13 @@ def dbadd(request):
                     print"Now the db input"
                     print"Equip No"
                     print i
-                    print request.session['user_ID']
+                    print request.session.keys()
                     eqEn=Equipment.objects.get(id=i)
                     usEn=User.objects.get(id=request.session['user_ID'])
                     print eqEn
-                    print usEn
+                    print "My Name is"
+		    print usEn
+		    print "My mail is"
                     eNew= Entry(
                         equipment = eqEn,
                         title = Entrytitle,
@@ -521,7 +567,14 @@ def dbadd(request):
                         enddate = eDT,
                         creator = usEn
                     )
+                    print "Hallo1"
+                    print sDT
+                    print eqEn.name
+		    print eqEn.room
+                    print "Hallo2"
                     eNew.save()
+     	 	    type="new"
+                    mail(usEn, Entrydate1, Entrydate2, Entrytime1, Entrytime2, eqEn, type)
                     Entrydate1
                     b=Entrydate1.split("-")
                     year = b[0]
@@ -540,6 +593,7 @@ def history(request):
     if request.session.get('ldapU_is_auth'):
         context=True
         usEn=User.objects.get(id=request.session['user_ID'])
+        print usEn
         if usEn:
             entries = Entry.objects.filter(creator=usEn).order_by('-enddate')[:16]
             return render_to_response("ecalendar/history.html",{'context':context,'entries':entries})
@@ -704,7 +758,8 @@ def changeadd(request):
                     enddate = eDT,
                     creator = usEn
                 )
-
+        	type="change"
+                mail(usEn, Entrydate1, Entrydate2, Entrytime1, Entrytime2, eqEn, type)
                 return render_to_response('ecalendar/changed.html',{'context':context})
         else:
             return render_to_response('ecalendar/new.html',{'context':context})
@@ -718,10 +773,25 @@ def delete(request):
         context=True
     if request.method == 'POST':
         if request.session.get('ldapU_is_auth'):
-
             Entryid = request.POST['entry']
+            test = int(Entryid)
+            print test
+            for p in  Entry.objects.raw('SELECT id,equipment_id,date,enddate FROM ecalendar_entry WHERE id=%s',[test]):
+                print "Eq id"
+                print p.equipment_id
+                print p.date
+                print p.enddate
             Entry.objects.filter(id=Entryid).delete()
-
+            type="delet"
+            usEn=User.objects.get(id=request.session['user_ID'])
+            print "def Delete"
+            print usEn.email
+            Entrydate1=0
+            Entrydate2=0 
+            Entrytime1=0
+            Entrytime2=0 
+            eqEn=0
+            mail(usEn, Entrydate1, Entrydate2, Entrytime1, Entrytime2, eqEn, type)
             return render_to_response('ecalendar/delete.html',{'context':context})
 
         else:
