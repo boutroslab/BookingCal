@@ -5,6 +5,7 @@ from bookingCal import settings
 admin.autodiscover()
 
 urlpatterns = patterns('',
+   # (r'^booking/$', 'bookingCal.views.name'),
     (r'^booking/$', 'bookingCal.views.index'),
     (r'^admin/', include(admin.site.urls)),
     (r'^booking/admin/', include(admin.site.urls)),

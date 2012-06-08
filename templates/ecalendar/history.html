@@ -49,6 +49,20 @@
                 <td class="title"><b>Start date</b></td>
                 <td>{{ entry.date }}</td>
             </tr>
+	   {% if admin %}
+	   {% if entry.guest_id != 0 %}
+	    <tr>
+		<td class="title"><b>Guest Name:</b></td>
+		<td>{{entry.guest.firstname}}{{entry.guest.surname}}</td>
+	   </tr>
+	   {%endif%}
+	   {%if entry.guest_id == 0%}
+	    <tr> 
+                <td class="title"><b>Guest Name:</b></td>
+                <td>{{"-"}}</td>
+           </tr>
+           {%endif%}
+	   {%endif%}
             <tr>
                 <td class="title"><b>End date</b></td>
                 <td>{{ entry.enddate }}</td>

@@ -33,7 +33,6 @@
     <h2> {{ day }}.{{ month }}.{{ year }}</h2>
 
 
-
     {% for entry in entries %}
 
       <div class="{% cycle 'inp1' 'inp2' %}" onClick="parent.location='{% url ecalendar.views.event entry.id %}'"
@@ -51,6 +50,17 @@
                         <td><b>Creator:</b></td>
                         <td>{{ entry.creator.first_name }} {{ entry.creator.last_name }}</td>
                     </tr>
+		{% if entry.guest_id != 0 %}
+		<tr>
+			<td><b>Lender:</b></td>
+                        <td>Guest: {{ entry.guest.firstname }} {{ entry.guest.surname}}</td>
+		</tr>
+		{% else %}
+   	        <tr>
+                        <td><b>Lender:</b></td>
+                        <td>{{ entry.creator.first_name }} {{ entry.creator.last_name }}</td>
+                </tr>
+		{%endif%}
                 <tr>
                     <td><b>Start Date:</b></td>
                     <td>{{ entry.date}} </td>

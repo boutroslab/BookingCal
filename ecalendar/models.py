@@ -9,6 +9,10 @@ from datetime import datetime
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
+class Guest(models.Model):
+    firstname = models.CharField(max_length=40, blank=False)
+    surname = models.CharField(max_length=40, blank=False)
+    email = models.CharField(max_length=40, blank=False)
 
 class Equipment(models.Model):
     name = models.CharField(max_length=40, blank=False)
@@ -26,10 +30,13 @@ class Entry(models.Model):
     enddate = models.DateTimeField(blank=False)
     creator = models.ForeignKey(User,blank=True)
     remind = models.BooleanField(default=False)
+    guest = models.ForeignKey(Guest , blank= False, null=False)
 
     def equipment_name(self):
         return self.equipment.name
     equipment_name.admin_order_field = 'equipment__name'
+
+
 
 #    def save(self, **kwargs):
 ##        if self.creator:

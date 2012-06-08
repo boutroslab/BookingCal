@@ -24,15 +24,48 @@
 <!--[if lte IE 7]><link rel="stylesheet" type="text/css" href="/Users/Yannic/PycharmProjects/bookingCal/static/admin/css/ie.css" /><![endif]-->
 
 <!--<script type="text/javascript" src="../../../jsi18n/"></script>-->
-<script type="text/javascript" src="/static/admin/js/core.js"></script>
-<script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
-<script type="text/javascript" src="/static/admin/js/jquery.min.js"></script>
-<script type="text/javascript" src="/static/admin/js/jquery.init.js"></script>
-<script type="text/javascript" src="/static/admin/js/actions.min.js"></script>
-<script type="text/javascript" src="/static/admin/js/calendar.js"></script>
-<script type="text/javascript" src="/static/admin/js/admin/DateTimeShortcuts.js"></script>
+<script type="text/javascript" src="/booking/static/admin/js/core.js"></script>
+<script type="text/javascript" src="/booking/static/admin/js/admin/RelatedObjectLookups.js"></script>
+<script type="text/javascript" src="/booking/static/admin/js/jquery.min.js"></script>
+<script type="text/javascript" src="/booking/static/admin/js/jquery.init.js"></script>
+<script type="text/javascript" src="/booking/static/admin/js/actions.min.js"></script>
+<script type="text/javascript" src="/booking/static/admin/js/calendar.js"></script>
+<script type="text/javascript" src="/booking/static/admin/js/admin/DateTimeShortcuts.js"></script>
+<script type="text/javascript">
 
-<br/>
+        function loseFocus()
+        {
+                document.getElementById("id_date_0").blur();
+                document.getElementById("id_enddate_0").blur();
+                document.getElementById("id_title").blur();
+        }
+
+        function switchTime(frm)
+        {
+                if(frm.date_1.value > "24:00")
+                        alert("The Day has only 24 hours!")
+                else if(frm.date_1.value == "24:00")
+                        frm.date_1.value = "00:00"
+                if(frm.date_1.value > "24:00")
+                        frm.date_1.value = ""
+                if(frm.enddate_1.value > "24:00")
+                        alert("The Day has only 24 hours!")
+                else if(frm.enddate_1.value == "24:00")
+                        frm.enddate_1.value = "00:00"
+                if(frm.enddate_1.value > "24:00")
+                        frm.enddate_1.value = ""
+        }
+
+
+
+
+        function checkDate(frm)
+        {
+                if(frm.date_0.value == "2012-04-10")
+                        alert("Das war schon!")
+        }
+</script>
+
 <a class="back" href="javascript:history.back()" > &lt;&lt; back </a>
 
 <div id="content">
@@ -70,8 +103,6 @@
                         <div>
                             <label for="id_equipment" class="required">Equipment:</label>
                             <input type="text" name="equipment_name" id="id_equipment_name" value="{{ entries.equipment.name }}" disabled />
-                            <a href="javascript:showEquiptments()" class="related-lookup" id="lookup_id_equipment">
-                                <img src="/static/admin/img/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>
                             <div class="equipOverlay" id="overLay">
                                 <table>
                                     <tr class="entryHead">
@@ -113,17 +144,17 @@
                     <div class="form-row date">
                         <div>
                             <label for="id_date_0" class="required">Date:</label>
-                            <p class="datetime">Date: <input name="date_0" class="vDateField" id="id_date_0" size="10" type="text"  value="{{ startdate }}" readonly>
+                            <p class="datetime">Date: <input name="date_0" class="vDateField" id="id_date_0" size="10" style="color:#808080;background:#F0F0F0" type="text" onchange="checkDate(this.form)" onclick="loseFocus()"  value="{{ startdate }}" >
 
-                                <br>Time: <input name="date_1" id="id_date_1" class="vTimeField"  size="8" type="text" value="{{ starttime }}" ></p>
+                                <br>Time: <input name="date_1" id="id_date_1" class="vTimeField"  size="10" type="text" value="{{ starttime }}" onblur="switchTime(this.form)" ></p>
                         </div>
                     </div>
                     <div class="form-row enddate">
                         <div>
                             <label for="id_enddate_0" class="required">Enddate:</label>
-                            <p class="datetime">Date: <input id="id_enddate_0" class="vDateField" name="enddate_0" size="10" type="text" value="{{ enddate }}" readonly>
+                            <p class="datetime">Date: <input id="id_enddate_0" class="vDateField" name="enddate_0" size="10" style="color:#808080;background:#F0F0F0" type="text" onchange="checkDate(this.form)" onclick="loseFocus()" value="{{ enddate }}" >
 
-                                <br>Time: <input id="id_enddate_1" class="vTimeField" name="enddate_1" size="8" type="text" value="{{ endtime }}">
+                                <br>Time: <input id="id_enddate_1" class="vTimeField" name="enddate_1" size="10" type="text" value="{{ endtime }}" onblur="switchTime(this.form)" /> example: 09:00 or 21:00</p>
                         </div>
                     </div>
                 </fieldset>
@@ -131,10 +162,9 @@
                 <fieldset class="module aligned ">
                     <h2>Informations</h2>
 
-                    <div style="visibility: hidden;">
+                    <div>
                         <div>
-                            <label for="id_title" class="required">Title:</label>
-                            <input id="id_title" type="text"name="title" maxlength="40" value="{{ entries.title }}" />
+                            <input id="id_title" type="text" name="title" maxlength="40" style="color:#808080;background:#F0F0F0" value="{{ entries.title }}" onclick="loseFocus()"/>
                         </div>
                     </div>
                     <div class="form-row body">

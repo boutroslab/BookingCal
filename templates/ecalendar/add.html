@@ -32,35 +32,96 @@
 <script type="text/javascript" src="/booking/static/admin/js/calendar.js"></script>
 <script type="text/javascript" src="/booking/static/admin/js/admin/DateTimeShortcuts.js"></script>
 <script type="text/javascript">
+          
+
 
 	function loseFocus()
 	{ 
 		document.getElementById("id_date_0").blur();
 		document.getElementById("id_enddate_0").blur();
 	}
-	function switchTime(frm)
-	{
-		if(frm.date_1.value > "24:00")
-			alert("The Day has only 24 hours!")
-		else if(frm.date_1.value == "24:00")
-			frm.date_1.value = "00:00"
-
-		if(frm.enddate_1.value > "24:00")
-			alert("The Day has only 24 hours!")
-		else if(frm.enddate_1.value == "24:00")
+	
+        function switchTime(frm)
+        {
+                if(frm.date_1.value > "24:00")
+                        alert("The Day has only 24 hours!")
+                else if(frm.date_1.value == "24:00")
+                        frm.date_1.value = "00:00"
+                if(frm.date_1.value > "24:00")
+                        frm.date_1.value = ""
+                if(frm.enddate_1.value > "24:00")
+                        alert("The Day has only 24 hours!")
+                else if(frm.enddate_1.value == "24:00")
                         frm.enddate_1.value = "00:00"
-	}
-	function checkDate(frm)
+                if(frm.enddate_1.value > "24:00")
+                        frm.enddate_1.value = ""
+        }
+
+
+
+        function checkDate(frm)
 	{
 		if(frm.date_0.value == "2012-04-10")
 			alert("Das war schon!")
 	}
+		
+
+		    function pluseqi(name,id){
+//              alert(id);
+                dropBox = document.getElementById("id_equipment_name");
+                var drop = (dropBox.options.length);
+                var TheTextBox = document.getElementById("id_eqilist");
+                TheTextBox.value = TheTextBox.value + name;
+                var selectBox = document.getElementById("id_eqilist2");
+                addOption(selectBox,name,name,id, drop);
+
+
+        }
+
+        function addOption(selectbox,text,value,id, drop ){
+                var optn = document.createElement("OPTION");
+                optn.text = text;
+                optn.id = id;
+                optn.value = value;
+                var wert = value;
+                putIn="True";
+                for(var i = 0; i < selectbox.length; i++)
+                 {
+                    if(selectbox.options[i].value == value){
+                    putIn="False";
+                    alert(putIn);
+                    }
+                 }
+                if(putIn=="True"){
+                selectbox.options.add(optn);
+		if(document.getElementById("id_equipment").value ==""){
+                document.getElementById("id_equipment").value= document.getElementById("id_equipment").value + id;}
+                else{
+                document.getElementById("id_equipment").value= document.getElementById("id_equipment").value + "," + id;
+                }
+}
+}
+	function myDelete(){
+		var i = document.getElementById("id_eqilist2").length;
+	        //alert (i);	
+		var eqiIdTextbox = document.getElementById("id_equipment").value;
+		//var spliting = eqiIdTextbox.split(",",3);
+		//alert(spliting);
+		document.getElementById("id_eqilist2")[document.getElementById("id_eqilist2").length - 1] = null;
+		var i = document.getElementById("id_eqilist2").length;
+		var spliting = eqiIdTextbox.split(",",i);
+                document.getElementById("id_equipment").value = spliting;
+
+
+	}
+
 </script>
+
 <div id="content">
 
     <h1>Add entry</h1>
     <div id="content-main">
-        <form action="/booking/kalendar/new/dbadd/" method="post" accept-charset="utf-8" id="entry_form">{% csrf_token %}
+        <form action="/booking/kalendar/new/dbadd/" method="post" accept-charset="utf-8" onsubmit="return FornCheck(this);"  id="entry_form">{% csrf_token %}
             <div style='display:none'>
                 <input type='hidden' name='csrf'  /></div>
             <div>
@@ -83,52 +144,86 @@
                 </div>
                 <a href="javascript:history.back()" class="errorBackButton">Go back</a>
                 {% else %}
-
-                <fieldset class="module aligned ">
+		<fieldset class="module aligned ">
                     <h2>Equipment
                                                </h2>
                     <div class="form-row equipment">
                         <div>
                             <label for="id_equipment" class="required">Equipment:</label>
-                            <input type="text" name="equipment_name" id="id_equipment_name" disabled />
-                            <a href="javascript:showEquiptments('overLay')" class="related-lookup" id="lookup_id_equipment">
-                                <img src="/booking/static/admin/img/admin/selector-search.gif" width="16" height="16" alt="Lookup" /></a>
+                            <select name="equipment_name"  id="id_equipment_name"  />
                             <div class="equipOverlay" id="overLay">
-                                <table>
-                                    <tr class="entryHead">
-                                        <td colspan="3"><b>Choose a Equipment</b></td>
-                                    </tr>
-                                    <tr class="entryUnderHead">
-                                        <th>Name</th>
-                                        <th>Room</th>
-                                        <th>Description</th>
-
-                                    </tr>
 
                                     {% for entry in entries %}
 
-                                    <tr id="entryTD" class="entryTD" onclick="setEquiptment({{ entry.id }},'{{ entry.name }}','overLay','id_equipment','id_equipment_name')" style="cursor:pointer">
-                                        <td>{{ entry.name }}</td>
-                                        <td>{{ entry.room }}</td>
-                                        <td>{{ entry.desc }}</td>
-                                    </tr>
+                                    <option id="entryTD"  onclick="pluseqi('{{entry.name}}',{{ entry.id }}),this.select"; onclick="setEquiptment({{ entry.id }},'{{ entry.name }}','overLay','id_equipment','id_equipment_name')" >
+                                        {{ entry.name }}
+                                    </option>
 
                                     {% empty %}
-                                    <tr>
-                                        <td colspan="3">no Entry   </td>
-                                    </tr>
 
                                     {% endfor %}
-                                    <tr class="entryCancel"  >
-                                        <td colspan="3" onclick="cancelOverlay('overLay')" ><b style="cursor:pointer">Cancel</b></td>
-                                    </tr>
-                                </table>
-
+                                    <input type="hidden" name="eqi_list" id="id_eqilist" value=""></input>
+                                     <select name="eqilist2" id="id_eqilist2" size="5" style=width:150px>
+                                    </select>
+				    <input type="button" name="delete" id="id_deletebutton" value="Delete" onclick="myDelete(this.id)"></input>
                             </div>
-                            <input type="text" name="equipment" id="id_equipment" />
+                            <input type="hidden" name="equipment" id="id_equipment"/>
                         </div>
                     </div>
-                                    </fieldset>
+
+                                   </fieldset>
+                <input type="radio" value="forlabmem" name="forwho" checked="checked" hidden onclick="firstname.disabled=true;lastname.disabled=true;email.disabled=true"/>
+                {% if admin %}
+                 <fieldset class="module aligned ">
+                        <div id="content">
+
+
+		
+
+
+                   <h2>Guest Booking</h2>
+
+                   <h3>Guest Booking</h3>
+        <table>
+           
+            <tr>
+                <td>    <lable for="forguest">for Guest </lable>
+ 		
+			<input type="radio" value="forguest" name="forwho" onclick="firstname.disabled=false;lastname.disabled=false;email.disabled=false"></td>
+		<td>
+                        <lable for="forlabmem">for B110 Labmember </lable>
+                
+                        <input type="radio" value="forlabmem" name="forwho" checked="checked" onclick="firstname.disabled=true;lastname.disabled=true;email.disabled=true"/></td>
+
+            </tr>
+            <tr>
+                <td width="100px">
+                    <label for="firstname">First name </label>
+                </td>
+                <td>
+                    <input type="text" name="firstname"  id="firstname" disabled = false  />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="lastname">Last name</label>
+                </td>
+                <td><input type="text" name="lastname"  id="lastname" disabled = false />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="email">E-mail</label>
+                </td>
+                <td>
+                    <input type="text" name="email"  id="mail" disabled = false />
+                </td>
+            </tr>
+        </table>
+
+			</div>
+ 	</fieldset>
+	{% endif %}
                 <fieldset class="module aligned ">
                     <h2>Date information</h2>
                     <div class="form-row date">
@@ -142,7 +237,7 @@
                     <div class="form-row enddate">
                         <div>
                             <label for="id_enddate_0" class="required">Enddate:</label>
-                            <p class="datetime">Date: <input id="id_enddate_0" class="vDateField" name="enddate_0" size="10" style="background:#F0F0F0" type="text" readonly onclick="loseFocus()">
+                            <p class="datetime">Date: <input id="id_enddate_0" class="vDateField" name="enddate_0" size="10" style="background:#F0F0F0" type="text"  onclick="loseFocus()">
 
                                 <br>Time: <input id="id_enddate_1" class="vTimeField" name="enddate_1" size="8" type="text" onblur="switchTime(this.form)" /> example: 09:00 or 21:00</p>
                         </div>
@@ -168,7 +263,7 @@
                 <div class="submit-row" >
                     <input type="submit" value="Complete the Reservation" class="submit" name="_save" />
                 </div>
-                <input type="hidden" name="countEquip" id="countEquip" />
+		                <input type="hidden" name="countEquip" id="countEquip" />
             </div>
         </form></div>
     <br class="clear" />
