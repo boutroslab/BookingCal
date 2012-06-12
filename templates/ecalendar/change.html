@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Kalendar{% endblock %}
+{% block title %}LIBS{% endblock %}
 
 
 {% block content %}
@@ -164,7 +164,7 @@
 
                     <div>
                         <div>
-                            <input id="id_title" type="text" name="title" maxlength="40" style="color:#808080;background:#F0F0F0" value="{{ entries.title }}" onclick="loseFocus()"/>
+                            <input id="id_title" type="hidden" name="title" maxlength="40" style="color:#808080;background:#F0F0F0" value="{{ entries.title }}" onclick="loseFocus()"/>
                         </div>
                     </div>
                     <div class="form-row body">

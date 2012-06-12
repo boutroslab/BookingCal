@@ -12,7 +12,7 @@ def index(request):
         context=False
     print "hallo hier"
     print request
-    return render_to_response('index.html',dict(request=request,context=context))
+    return render_to_response('index.html',dict(request=request,context=context), context_instance=RequestContext(request))
 def equip(request):
     if request.session.get('ldapU_is_auth'):
         context=True

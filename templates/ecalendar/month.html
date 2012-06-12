@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Kalendar{% endblock %}
+{% block title %}LIBS{% endblock %}
 
 {% block content %}
 <!--  <script type="text/javascript" src="/static/main/js/jquery-1.5.1.min.js"></script>
@@ -137,7 +137,6 @@ function loseFocus()
                 hreflink=hreflink.concat(month);
                 hreflink=hreflink.concat("/sort/");
                 hreflink=hreflink.concat($(id).children().filter(':selected').first().attr('id'));
-//console.log($(id).children().filter(':selected').first().attr('id'));
                 document.location.href=hreflink;
             }
 	    function backCalendar(year,month,id){

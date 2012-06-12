@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Kalendar{% endblock %}
+{% block title %}LIBS{% endblock %}
+
 
 {% block content %}
 <script type="text/javascript">
@@ -65,6 +66,18 @@
                 <td><b>Creator:</b></td>
                 <td>{{ entries.creator.first_name }} {{ entries.creator.last_name }}</td>
             </tr>
+        {% if entries.guest_id != 0 %}
+             <tr>
+                        <td><b>Person:</b></td>
+                        <td>Guest: {{ entries.guest.firstname }} {{ entries.guest.surname}}</td>
+            </tr>
+         {% else %}
+            <tr>
+                        <td><b>Person:</b></td>
+                        <td>{{ entries.creator.first_name }} {{ entries.creator.last_name }}</td>
+            </tr>
+        {%endif%}
+
             <tr>
                 <td valign="top"><b>Information:</b></td>
                 <td><pre> {{ entries.body }}</pre></td>

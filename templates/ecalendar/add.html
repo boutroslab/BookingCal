@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Kalendar{% endblock %}
+{% block title %}LIBS{% endblock %}
 
 
 {% block content %}
@@ -66,8 +66,9 @@
 	}
 		
 
-		    function pluseqi(name,id){
-//              alert(id);
+         function pluseqi(el){
+		id = $(el).children().filter(':selected').first().attr('id'); console.log(id);
+		name = $(el).children().filter(':selected').first().html();console.log(name);
                 dropBox = document.getElementById("id_equipment_name");
                 var drop = (dropBox.options.length);
                 var TheTextBox = document.getElementById("id_eqilist");
@@ -89,7 +90,7 @@
                  {
                     if(selectbox.options[i].value == value){
                     putIn="False";
-                    alert(putIn);
+                    alert("This equipment has been selected!");
                     }
                  }
                 if(putIn=="True"){
@@ -150,12 +151,16 @@
                     <div class="form-row equipment">
                         <div>
                             <label for="id_equipment" class="required">Equipment:</label>
-                            <select name="equipment_name"  id="id_equipment_name"  />
+                            <select name="equipment_name"  id="id_equipment_name" onchange="pluseqi(this)" />
                             <div class="equipOverlay" id="overLay">
+				     <option hidden>
+					Please choose one...
+				    </option>
 
                                     {% for entry in entries %}
+				     
 
-                                    <option id="entryTD"  onclick="pluseqi('{{entry.name}}',{{ entry.id }}),this.select"; onclick="setEquiptment({{ entry.id }},'{{ entry.name }}','overLay','id_equipment','id_equipment_name')" >
+                                    <option id="{{ entry.id }}" >
                                         {{ entry.name }}
                                     </option>
 
@@ -172,10 +177,9 @@
                     </div>
 
                                    </fieldset>
-                <input type="radio" value="forlabmem" name="forwho" checked="checked" hidden onclick="firstname.disabled=true;lastname.disabled=true;email.disabled=true"/>
+               <input type="radio" value="forlabmem" name="forwho" checked="checked" hidden onclick="firstname.disabled=true;lastname.disabled=true;email.disabled=true"/>
                 {% if admin %}
                  <fieldset class="module aligned ">
-                        <div id="content">
 
 
 		
@@ -221,7 +225,6 @@
             </tr>
         </table>
 
-			</div>
  	</fieldset>
 	{% endif %}
                 <fieldset class="module aligned ">

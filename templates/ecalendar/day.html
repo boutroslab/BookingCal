@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Kalendar{% endblock %}
+{% block title %}LIBS{% endblock %}
 
 {% block content %}
 
@@ -52,12 +52,12 @@
                     </tr>
 		{% if entry.guest_id != 0 %}
 		<tr>
-			<td><b>Lender:</b></td>
+			<td><b>Person:</b></td>
                         <td>Guest: {{ entry.guest.firstname }} {{ entry.guest.surname}}</td>
 		</tr>
 		{% else %}
    	        <tr>
-                        <td><b>Lender:</b></td>
+                        <td><b>Person:</b></td>
                         <td>{{ entry.creator.first_name }} {{ entry.creator.last_name }}</td>
                 </tr>
 		{%endif%}

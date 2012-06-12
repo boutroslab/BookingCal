@@ -21,7 +21,7 @@ var DateTimeShortcuts = {
         if (window.__admin_media_prefix__ != undefined) {
             DateTimeShortcuts.admin_media_prefix = window.__admin_media_prefix__;
         } else {
-            DateTimeShortcuts.admin_media_prefix = '/missing-admin-media-prefix/';
+            DateTimeShortcuts.admin_media_prefix = '';
         }
 
         var inputs = document.getElementsByTagName('input');

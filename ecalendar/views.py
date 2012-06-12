@@ -265,11 +265,7 @@ def ldapU(request, username, password):
 
 def backendAuth(username,name, mail):
     password = '123Secret'
-#    user = User.objects.get(username=username)
-    print "Backend"
-    print name[0]
     name[0] = name[0].replace(",","")
-    print name[0]
     name_list = name[0].split(' ')
     lastname = name_list[0]
     firstname =name_list[1]
@@ -279,8 +275,6 @@ def backendAuth(username,name, mail):
     if user is not None:
         return
     else:
-	print "Hier kommt der Last Name:"
-        print lastname
         lastname.replace(",","")
         user = User.objects.create_user(username, '', password)
         user.first_name = firstname
@@ -296,8 +290,8 @@ def new(request):
     c = {}
     c.update(csrf(request))
     if not request.session.get('ldapU_is_auth'):
-        return render_to_response('ecalendar/new.html',c)
-        return render_to_response('index.html',{'loggedIn':'true'})
+        return render_to_response('ecalendar/new.html',c,context_instance=RequestContext(request))
+        return render_to_response('index.html',{'loggedIn':'true'},context_instance=RequestContext(request))
     else:
         return add(request,"")
     
@@ -311,27 +305,30 @@ def mail(user, startdate, enddate, starttime, endtime, eqi, type,is_guest):
     recipients = user.email
     if is_guest != 0:
         recipients=is_guest.email
+	firstname = is_guest.firstname
+    else:
+        firstname = user.first_name
     print "recipients"
     print recipients
     sender = 'maximilian.koch@dkfz.de'
     if (type=="new"):
         subject = "reservation"
         if (startdate != enddate):
-            msg_text = "Hello "+user.first_name+",\n " "you have booked "+ eqi.name +" on "+ startdate + " at "+ starttime +" to "+ enddate +" at "+ endtime+"."
+            msg_text = "Hello "+ firstname+",\n " "you have booked "+ eqi +" on "+ startdate + " at "+ starttime +" to "+ enddate +" at "+ endtime+"."
         else:
-            msg_text = "Hello "+user.first_name+",\n " "you have booked "+ eqi.name +" on "+ startdate + " at "+ starttime +" to "+ endtime+"."
+            msg_text = "Hello "+ firstname +",\n " "you have booked "+ eqi +" on "+ startdate + " at "+ starttime +" to "+ endtime+"."
     if (type=="change"):
         subject = "changed"
         if (startdate != enddate):
-            msg_text = "Hello "+user.first_name+",\n " "you have booked "+ eqi.name +" on "+ startdate + " at "+ starttime +" to "+ enddate +" at "+ endtime+"."
+            msg_text = "Hello "+ firstname +",\n " "you have booked "+ eqi +" on "+ startdate + " at "+ starttime +" to "+ enddate +" at "+ endtime+"."
         else:
-            msg_text = "Hello "+user.first_name+",\n " "you have booked "+ eqi.name +" on "+ startdate + " at "+ starttime +" to "+ endtime+"."
+            msg_text = "Hello "+ firstname +",\n " "you have booked "+ eqi +" on "+ startdate + " at "+ starttime +" to "+ endtime+"."
     if (type=="delete"):
         subject = "deleting"
         if (startdate != enddate):
-            msg_text = "Hello "+user.first_name+",\n " "you have deleted your booked "+ eqi +" that you have booked on "+ startdate +" to "+ enddate +"."
+            msg_text = "Hello "+ firstname +",\n " "you have deleted your booked "+ eqi +" that you have booked on "+ startdate +" to "+ enddate +"."
         else:
-            msg_text = "Hello "+user.first_name+",\n " "you have deleted your booked "+ eqi +" that you have booked on "+ enddate +"."
+            msg_text = "Hello "+ firstname +",\n " "you have deleted your booked "+ eqi +" that you have booked on "+ enddate +"."
     msg = MIMEText(msg_text)
     msg['Subject'] = subject
     s = smtplib.SMTP()
@@ -646,6 +643,7 @@ def dbadd(request):
 			        print "g1.id"
 		   	        print g1.id
 			        print "guen"
+				print g1.email
 			        print guEn
 			        print "g1 creator"
 		                eNew= Entry(
@@ -659,9 +657,11 @@ def dbadd(request):
                             )
 	                     
                             eNew.save()
-			    mailList.append(eqEn)
+			    mailList.append(eqEn.name)
 			    print ("print mailList")
-			    print str(mailList) 
+			    print str(mailList)
+			    strmailList=", ".join(mailList)
+			    print strmailList 
      	 	            type="new"
                             #mail(usEn, Entrydate1, Entrydate2, Entrytime1, Entrytime2, eqEn, type, g1)
                             Entrydate1
@@ -669,7 +669,7 @@ def dbadd(request):
                             year = b[0]
                             month = b[1]
 			    if roundCount == len(EidList):
-			        mail(usEn, Entrydate1, Entrydate2, Entrytime1, Entrytime2, eqEn, type, g1)
+			        mail(usEn, Entrydate1, Entrydate2, Entrytime1, Entrytime2, strmailList, type, g1)
 		        else:
                             print ("Hier ist der Fehler")
                             print eqEn.name
@@ -735,7 +735,7 @@ def change(request, evid):
 def changeadd(request):
     if request.session.get('ldapU_is_auth'):
         context=True
-
+    mailList=[]
     c = {}
     c.update(csrf(request))
 
@@ -876,7 +876,10 @@ def changeadd(request):
                         guest = guEn
                        )
         	type="change"
-                mail(usEn, Entrydate1, Entrydate2, Entrytime1, Entrytime2, eqEn, type, g1)
+		mailList.append(eqEn.name)
+                strmailList=", ".join(mailList)
+                print strmailList
+                mail(usEn, Entrydate1, Entrydate2, Entrytime1, Entrytime2, strmailList, type, g1)
                 return render_to_response('ecalendar/changed.html',{'context':context})
         else:
             return render_to_response('ecalendar/new.html',{'context':context})

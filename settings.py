@@ -83,7 +83,7 @@ MEDIA_ROOT =path+ '/static'
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
 
-#ADMIN_MEDIA_PREFIX = '/var/www/django/django_projects/bookingCal/static'
+#ADMIN_MEDIA_PREFIX = '/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'eu_2&go98qy@ad&(g^!hggtt=i#+hjg48*-u$)0)+a-8!6c=b-'
