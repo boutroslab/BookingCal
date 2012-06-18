@@ -12,7 +12,8 @@ import time
 from bookingCal.ecalendar.models import Entry
 from bookingCal.ecalendar.models import Equipment
 from bookingCal.ecalendar.models import Guest
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
+from django.contrib.auth import logout as logout_
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
@@ -27,7 +28,6 @@ import ldap
 from django.template import RequestContext
 import re
 from django.utils import simplejson
-from django.shortcuts import render_to_response
 from django.core import serializers
 import string
 from time import gmtime, strftime
@@ -80,7 +80,7 @@ def main(request, year=None):
         context=False
 
     return render_to_response("ecalendar/index.html", dict(years=lst, year=year,
-                              reminders=reminders(request),request=request,context=context))
+                              reminders=reminders(request),request=request,context=context), context_instance=RequestContext(request))
 
 def month(request, year, month, change=None,eq=None):
     """Listinng of days in 'month'. """
@@ -156,7 +156,7 @@ def month(request, year, month, change=None,eq=None):
         context=False
     equipment=Equipment.objects.all()
         
-    return render_to_response("ecalendar/month.html", dict(year=year,id_eq=eq,month=month, month_days=lst, mname=mnames[month-1],equipmentName=equipname,request=request,context=context,equipment=equipment))
+    return render_to_response("ecalendar/month.html", dict(year=year,id_eq=eq,month=month, month_days=lst, mname=mnames[month-1],equipmentName=equipname,request=request,context=context,equipment=equipment), context_instance=RequestContext(request))
 
 def day(request, year, month, day, eq=None):
     year, month, day = int(year), int(month), int(day)
@@ -183,7 +183,7 @@ def day(request, year, month, day, eq=None):
     else:
         context=False
     equipment=Equipment.objects.all()
-    return render_to_response("ecalendar/day.html", dict(year=year, month=month, day=day, entries=entries ,request=request,context=context,equipment=equipment))
+    return render_to_response("ecalendar/day.html", dict(year=year, month=month, day=day, entries=entries ,request=request,context=context,equipment=equipment), context_instance=RequestContext(request))
 
 def event(request, evid):
     if request.session.get('ldapU_is_auth'):
@@ -193,7 +193,7 @@ def event(request, evid):
     if evid:
         entries = Entry.objects.get(id=evid)
 
-    return render_to_response("ecalendar/event.html", dict(entries=entries ,request=request,context=context))
+    return render_to_response("ecalendar/event.html", dict(entries=entries ,request=request,context=context), context_instance=RequestContext(request))
 
 def ldapU(request, username, password):
     c = {}
@@ -291,7 +291,6 @@ def new(request):
     c.update(csrf(request))
     if not request.session.get('ldapU_is_auth'):
         return render_to_response('ecalendar/new.html',c,context_instance=RequestContext(request))
-        return render_to_response('index.html',{'loggedIn':'true'},context_instance=RequestContext(request))
     else:
         return add(request,"")
     
@@ -362,7 +361,7 @@ def add(request,errormsg):
 def guest(request):
     c = {}
     c.update(csrf(request))
-    return render_to_response('ecalendar/guest.html',c)
+    return render_to_response('ecalendar/guest.html',c, context_instance=RequestContext(request))
 
 def guestReg(request):
     if request.method == 'POST':
@@ -411,8 +410,11 @@ def check(request):
                         request.session['user_ID'] = check.id
                         request.session['ldapU_is_auth'] = True
                         request.session['user_email'] = _email
+                        # setting backend on the user manually, because calling authenticate() doesn't work here
+                        # this is just a bad hack
+                        check.backend='django.contrib.auth.backends.ModelBackend'
+                        login(request, check)
                         return add(request,"")
-                      #  return render_to_response('index.html',{'loggedIn':'true'})
                     else:
                         return new(request)
                     
@@ -679,9 +681,9 @@ def dbadd(request):
                             if roundCount == len(EidList):
                                 return add(request, errormsg)
 
-            return render_to_response('ecalendar/input.html',{'context':context,'year':year,'month':month})
+            return render_to_response('ecalendar/input.html',{'context':context,'year':year,'month':month}, context_instance=RequestContext(request))
     else:
-        return render_to_response('ecalendar/add.html',{'context':context})
+        return render_to_response('ecalendar/add.html',{'context':context}, context_instance=RequestContext(request))
 
 
 
@@ -695,17 +697,17 @@ def history(request):
 	    admin=True
         if usEn:
             entries = Entry.objects.filter(creator=usEn).order_by('-enddate')[:16]
-            return render_to_response("ecalendar/history.html",{'context':context,'entries':entries,'admin':admin})
+            return render_to_response("ecalendar/history.html",{'context':context,'entries':entries,'admin':admin}, context_instance=RequestContext(request))
         else:
              return add(request,"Your User is not available!\n ")
     else:
-        return render_to_response('ecalendar/new.html')
+        return render_to_response('ecalendar/new.html', context_instance=RequestContext(request))
 
 def logout(request):
     del request.session['ldapU_is_auth']
     del request.session['user_ID']
-    return render_to_response('ecalendar/index.html')
-   # return render_to_response('base.html',{'loggedIn':'false'})
+    logout_(request)
+    return render_to_response('ecalendar/index.html', context_instance=RequestContext(request))
 
 def change(request, evid):
     if request.session.get('ldapU_is_auth'):
@@ -880,11 +882,11 @@ def changeadd(request):
                 strmailList=", ".join(mailList)
                 print strmailList
                 mail(usEn, Entrydate1, Entrydate2, Entrytime1, Entrytime2, strmailList, type, g1)
-                return render_to_response('ecalendar/changed.html',{'context':context})
+                return render_to_response('ecalendar/changed.html',{'context':context}, context_instance=RequestContext(request))
         else:
-            return render_to_response('ecalendar/new.html',{'context':context})
+            return render_to_response('ecalendar/new.html',{'context':context}, context_instance=RequestContext(request))
     else:
-        return render_to_response('ecalendar/add.html',{'context':context})
+        return render_to_response('ecalendar/add.html',{'context':context}, context_instance=RequestContext(request))
 
 def delete(request):
     c = {}
@@ -923,12 +925,12 @@ def delete(request):
             print Entrydate2
             print eqEn 
             mail(usEn, Entrydate1, Entrydate2, Entrytime1, Entrytime2, eqEn, type,g1)
-            return render_to_response('ecalendar/delete.html',{'context':context})
+            return render_to_response('ecalendar/delete.html',{'context':context}, context_instance=RequestContext(request))
 
         else:
-            return render_to_response('ecalendar/new.html',{'context':context})
+            return render_to_response('ecalendar/new.html',{'context':context}, context_instance=RequestContext(request))
     else:
-          return render_to_response('ecalendar/new.html',{'context':context})
+          return render_to_response('ecalendar/new.html',{'context':context}, context_instance=RequestContext(request))
 
 def ajax_search_equip(request):
     if request.is_ajax():
