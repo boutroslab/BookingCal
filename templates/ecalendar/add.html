@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}LIBS{% endblock %}
+{% block title %}Booking System{% endblock %}
 
 
 {% block content %}
@@ -44,17 +44,17 @@
         function switchTime(frm)
         {
                 if(frm.date_1.value > "24:00")
-                        alert("The Day has only 24 hours!")
+                        alert("The Day has only 24 hours!");
                 else if(frm.date_1.value == "24:00")
-                        frm.date_1.value = "00:00"
+                        frm.date_1.value = "00:00";
                 if(frm.date_1.value > "24:00")
-                        frm.date_1.value = ""
+                        frm.date_1.value = "";
                 if(frm.enddate_1.value > "24:00")
-                        alert("The Day has only 24 hours!")
+                        alert("The Day has only 24 hours!");
                 else if(frm.enddate_1.value == "24:00")
-                        frm.enddate_1.value = "00:00"
+                        frm.enddate_1.value = "00:00";
                 if(frm.enddate_1.value > "24:00")
-                        frm.enddate_1.value = ""
+                        frm.enddate_1.value = "";
         }
 
 
@@ -115,6 +115,16 @@
 
 
 	}
+	function noSeconde(frm){
+		if (frm.date_1.value.length == 8){
+		var newTime = frm.date_1.value.substring(0, frm.date_1.value.length-3);
+		document.getElementById("id_date_1").value = newTime;
+		}
+		if (frm.enddate_1.value.length == 8){
+                var newTime1 = frm.enddate_1.value.substring(0, frm.enddate_1.value.length-3);
+                document.getElementById("id_enddate_1").value = newTime1;
+                }
+	}
 
 </script>
 
@@ -170,7 +180,7 @@
                                     <input type="hidden" name="eqi_list" id="id_eqilist" value=""></input>
                                      <select name="eqilist2" id="id_eqilist2" size="5" style=width:150px>
                                     </select>
-				    <input type="button" name="delete" id="id_deletebutton" value="Delete" onclick="myDelete(this.id)"></input>
+				    <input type="button" name="delete" id="id_deletebutton" value="Deletet" onclick="myDelete(this.id)"></input>
                             </div>
                             <input type="hidden" name="equipment" id="id_equipment"/>
                         </div>
@@ -234,7 +244,7 @@
                             <label for="id_date_0" class="required">Date:</label>
                             <p class="datetime">Date: <input name="date_0" class="vDateField" id="id_date_0" size="10" style="background:#F0F0F0" type="text" onchange="checkDate(this.form)" onclick="loseFocus()">
 
-                                <br>Time: <input name="date_1" id="id_date_1" class="vTimeField"  size="8" type="text" onblur="switchTime(this.form)" /> example: 09:00 or 21:00</p>
+                                <br>Time: <input name="date_1" id="id_date_1" class="vTimeField"  size="8" type="text" onblur="switchTime(this.form)" onfocus="noSeconde(this.form)" /> example: 09:00 or 21:00</p>
                         </div>
                     </div>
                     <div class="form-row enddate">
@@ -242,7 +252,7 @@
                             <label for="id_enddate_0" class="required">Enddate:</label>
                             <p class="datetime">Date: <input id="id_enddate_0" class="vDateField" name="enddate_0" size="10" style="background:#F0F0F0" type="text"  onclick="loseFocus()">
 
-                                <br>Time: <input id="id_enddate_1" class="vTimeField" name="enddate_1" size="8" type="text" onblur="switchTime(this.form)" /> example: 09:00 or 21:00</p>
+                                <br>Time: <input id="id_enddate_1" class="vTimeField" name="enddate_1" size="8" type="text" onblur="switchTime(this.form)" onfocus="noSeconde(this.form)"/> example: 09:00 or 21:00</p>
                         </div>
                     </div>
                 </fieldset>

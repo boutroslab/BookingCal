@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}LIBS{% endblock %}
+{% block title %}Booking System{% endblock %}
 
 {% block content %}
 <style type="text/css">
@@ -28,8 +28,9 @@
 
     <h1>Delete entry</h1>
 
-    <b>The reservation has been delete.</b>
-
+    <img src="/booking/static/main/check.png">
+    <b>The reservation has been cancelled.</b>
+    <meta http-equiv="refresh" content="2; URL={% url ecalendar.views.history %}">
 </div>
 
 

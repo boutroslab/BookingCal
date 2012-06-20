@@ -107,6 +107,7 @@ def month(request, year, month, change=None,eq=None):
     cal = calendar.Calendar()
     month_days = cal.itermonthdays(year, month)
     nyear, nmonth, nday = time.localtime()[:3]
+    print "nday", nday
     lst = [[]]
     week = 0
 
@@ -502,7 +503,7 @@ def dbadd(request):
                         equip =request.POST[equiPostName]
                         if equip =="":
                             inputcheck += 1
-                            errormsg+="\nOne equipment is missing !"
+                            errormsg+="\nOne equipment is missing !\n"
                         for i in myEquipList:
 
                             if equip == i:
@@ -520,43 +521,43 @@ def dbadd(request):
                     atsign = re.compile("@")
                     if g_firstname=="":
                         inputcheck +=1
-		        errormsg+="\nWhere is the firstname from the guest?"
+		        errormsg+="\nWhere is the firstname from the guest?\n"
                     if g_surname=="":
 		        inputcheck +=1
-		        errormsg+="\nWhere is the Surname from the guest?"
+		        errormsg+="\nWhere is the Surname from the guest?\n"
                     if g_mail=="":
  		        inputcheck +=1
-		        errormsg+="\nWhere is the email from the guest?"
+		        errormsg+="\nWhere is the email from the guest?\n"
 		    if atsign.search(g_mail)==None:
                         inputcheck += 1
-                        errormsg +="\nWhere is the (at) sign in the mail adress?"
+                        errormsg +="\nWhere is the (at) sign in the mail adress?\n"
 
                 if Eid =="" :
                     inputcheck += 1
-                    errormsg+="\nYou haven't entered any equipment !"
+                    errormsg+="\nYou haven't entered any equipment !\n"
 
 
 #            if Entrytitle =="" :
 #                inputcheck += 1
-#                errormsg+="\nThe title is missing !"
+#                errormsg+="\nThe title is missing !\n"
                 if Entrydate1 =="" :
                     inputcheck += 1
-                    errormsg+="\nThe start date is missing !"
+                    errormsg+="\nThe start date is missing !\n"
                 if Entrydate2 =="" :
                     inputcheck += 1
-                    errormsg+="\nThe end date is missing !"
+                    errormsg+="\nThe end date is missing !\n"
                 if Entrytime1 =="" :
                     inputcheck += 1
-                    errormsg+="\nThe start time is missing !"
+                    errormsg+="\nThe start time is missing !\n"
                 if Entrytime2 =="" :
                     inputcheck += 1
-                    errormsg+="\nThe end time is missing !"
+                    errormsg+="\nThe end time is missing !\n"
                 if not regex.search(Entrytime1):
                     inputcheck += 1
-                    errormsg+="\nThe start time has a wrong Format ! The right Format is: HH:MM"
+                    errormsg+="\nThe start time has a wrong Format ! The right Format is: HH:MM\n"
                 if not regex.search(Entrytime2):
                     inputcheck += 1
-                    errormsg+="\nThe end time has a wrong Format ! The right Format is: HH:MM"
+                    errormsg+="\nThe end time has a wrong Format ! The right Format is: HH:MM\n"
                 if inputcheck > 0:
                     return add(request,errormsg)
 
@@ -573,7 +574,7 @@ def dbadd(request):
                     errormsg+="\nThe end time is before the start time !"
                     return add(request,errormsg)
                 if sDT<nDT:
-                    errormsg+="\nThe start time is in the past !"
+                    errormsg+="\nThe start time is in the past !\n"
                     return add(request,errormsg)
                 for i in myEquipList:
                     print"Equip No datecheck"
@@ -588,26 +589,26 @@ def dbadd(request):
                             print"in"
                             if sDT >= e.date and eDT <= e.enddate:
                                 checknumber += 1
-                                errormsg += eqEn.name + "\nis not available at this time!"
+                                errormsg += eqEn.name + "\nis not available at this time!\n"
                                 #return add(request, errormsg)
                             elif sDT >= e.date and sDT <= e.enddate and eDT >= e.enddate:
                                 checknumber += 1
-                                errormsg += "\nThe Equipment is not available at this time!"
+                                errormsg += "\nThe Equipment is not available at this time!\n"
                                 #return add(request, errormsg)
                             elif sDT <= e.date and eDT >= e.date and eDT <= e.enddate:
                                 checknumber += 1
-                                errormsg += "\nThe Equipment is not available at this time!"
+                                errormsg += "\nThe Equipment is not available at this time!\n"
                                 #return add(request, errormsg)
                             elif sDT <= e.date and eDT >= e.enddate:
                                 checknumber += 1
-                                errormsg += "\nThe Equipment is not available at this time!"
+                                errormsg += "\nThe Equipment is not available at this time!\n"
                                 #return add(request, errormsg)
                 
                     for equipm in Equipment.objects.raw('SELECT * FROM ecalendar_equipment'):
                         if equipm.id == i:
                             if equipm.enabled == False:
                                 checknumber += 1
-                                errormsg+="\nThe Equipment is not available!"
+                                errormsg+="\nThe Equipment is not available!\n"
                                 return add(request,errormsg)
 
 #            when the errorcounter is more than 0 the Reservation is not available
@@ -768,28 +769,28 @@ def changeadd(request):
             inputcheck=0
             if Eid =="" :
                 inputcheck += 1
-                errormsg+="\nThe equipment ID is missing !"
+                errormsg+="\nThe equipment ID is missing !\n"
 #            if Entrytitle =="" :
 #                inputcheck += 1
-#                errormsg+="\nThe title is missing !"
+#                errormsg+="\nThe title is missing !\n"
             if Entrydate1 =="" :
                 inputcheck += 1
-                errormsg+="\nThe start date is missing !"
+                errormsg+="\nThe start date is missing !\n"
             if Entrydate2 =="" :
                 inputcheck += 1
-                errormsg+="\nThe end date is missing !"
+                errormsg+="\nThe end date is missing !\n"
             if Entrytime1 =="" :
                 inputcheck += 1
-                errormsg+="\nThe start time is missing !"
+                errormsg+="\nThe start time is missing !\n"
             if Entrytime2 =="" :
                 inputcheck += 1
-                errormsg+="\nThe end time is missing !"
+                errormsg+="\nThe end time is missing !\n"
             if not regex.search(Entrytime1):
                 inputcheck += 1
-                errormsg+="\nThe start time has a wrong Format ! The right Format is: HH:MM:SS"
+                errormsg+="\nThe start time has a wrong Format ! The right Format is: HH:MM:SS\n"
             if not regex.search(Entrytime2):
                 inputcheck += 1
-                errormsg+="\nThe end time has a wrong Format ! The right Format is: HH:MM:SS"
+                errormsg+="\nThe end time has a wrong Format ! The right Format is: HH:MM:SS\n"
             if inputcheck > 0:
                 return change(request,errormsg)
 
@@ -802,7 +803,7 @@ def changeadd(request):
             eDT = datetime.fromtimestamp(time.mktime(time.strptime(Enddate, time_format)))
 
             if sDT>eDT:
-                errormsg+="\nThe end time is before the start time !"
+                errormsg+="\nThe end time is before the start time !\n"
                 return change(request,errormsg)
 
 
@@ -818,19 +819,19 @@ def changeadd(request):
 
                         if sDT >= e.date and eDT <= e.enddate:
                             checknumber += 1
-                            errormsg+="\nThe Equipment is not available at this time!"
+                            errormsg+="\nThe Equipment is not available at this time!\n"
                             return change(request,errormsg)
                         elif sDT >= e.date and sDT <= e.enddate and eDT >= e.enddate :
                             checknumber += 1
-                            errormsg+="\nThe Equipment is not available at this time!"
+                            errormsg+="\nThe Equipment is not available at this time!\n"
                             return change(request,errormsg)
                         elif sDT <= e.date and eDT >= e.date and eDT <= e.enddate :
                             checknumber += 1
-                            errormsg+="\nThe Equipment is not available at this time!"
+                            errormsg+="\nThe Equipment is not available at this time!\n"
                             return change(request,errormsg)
                         elif sDT <= e.date and eDT >= e.enddate:
                             checknumber += 1
-                            errormsg+="\nThe Equipment is not available at this time!"
+                            errormsg+="\nThe Equipment is not available at this time!\n"
                             return change(request,errormsg)
                 else:
                     print "The selected Entry"
@@ -838,7 +839,7 @@ def changeadd(request):
                 if equipm.id == Eid:
                     if equipm.enabled == False:
                         checknumber += 1
-                        errormsg+="\nThe Equipment is not available!"
+                        errormsg+="\nThe Equipment is not available!\n"
                         return change(request,errormsg)
 
 #            when the errorcounter is more than 0 the Reservation is not available

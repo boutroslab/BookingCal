@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}LIBS{% endblock %}
+{% block title %}Booking System{% endblock %}
 
 
 {% block content %}
@@ -64,6 +64,18 @@
                 if(frm.date_0.value == "2012-04-10")
                         alert("Das war schon!")
         }
+	
+	        function noSeconde(frm){
+                if (frm.date_1.value.length == 8){
+                var newTime = frm.date_1.value.substring(0, frm.date_1.value.length-3);
+                document.getElementById("id_date_1").value = newTime;
+                }
+                if (frm.enddate_1.value.length == 8){               
+		 var newTime1 = frm.enddate_1.value.substring(0, frm.enddate_1.value.length-3);
+                document.getElementById("id_enddate_1").value = newTime1;
+                }
+        }
+
 </script>
 
 <a class="back" href="javascript:history.back()" > &lt;&lt; back </a>
@@ -73,7 +85,7 @@
     <h1>Change entry</h1>
     {% if entries %}
 
-    <div id="content-main">
+    <div id="content-main" >
         <form action="/kalendar/changeadd/" method="post" accept-charset="utf-8" id="entry_form">{% csrf_token %}
             <div style='display:none'>
                 <input type='hidden' name='csrf'  />
@@ -146,7 +158,7 @@
                             <label for="id_date_0" class="required">Date:</label>
                             <p class="datetime">Date: <input name="date_0" class="vDateField" id="id_date_0" size="10" style="color:#808080;background:#F0F0F0" type="text" onchange="checkDate(this.form)" onclick="loseFocus()"  value="{{ startdate }}" >
 
-                                <br>Time: <input name="date_1" id="id_date_1" class="vTimeField"  size="10" type="text" value="{{ starttime }}" onblur="switchTime(this.form)" ></p>
+                                <br>Time: <input name="date_1" id="id_date_1" class="vTimeField"  size="10" type="text" value="{{ starttime }}" onblur="switchTime(this.form)" onfocus="noSeconde(this.form)">example: 09:00 or 21:00</p>
                         </div>
                     </div>
                     <div class="form-row enddate">
@@ -154,7 +166,7 @@
                             <label for="id_enddate_0" class="required">Enddate:</label>
                             <p class="datetime">Date: <input id="id_enddate_0" class="vDateField" name="enddate_0" size="10" style="color:#808080;background:#F0F0F0" type="text" onchange="checkDate(this.form)" onclick="loseFocus()" value="{{ enddate }}" >
 
-                                <br>Time: <input id="id_enddate_1" class="vTimeField" name="enddate_1" size="10" type="text" value="{{ endtime }}" onblur="switchTime(this.form)" /> example: 09:00 or 21:00</p>
+                                <br>Time: <input id="id_enddate_1" class="vTimeField" name="enddate_1" size="10" type="text" value="{{ endtime }}" onblur="switchTime(this.form)" onfocus="noSeconde(this.form)" /> example: 09:00 or 21:00</p>
                         </div>
                     </div>
                 </fieldset>
@@ -175,11 +187,11 @@
                     </div>
                 </fieldset>
                 <div class="submit-row" >
-                    <input type="submit" value="Complete the Reservation" class="submit" name="_save" />
+                    <input type="submit" value=" Complete the reservation" class="submit" name="_save" />
                     </form>
                     <form action="/kalendar/delete/" method="post" id="delete_form" onsubmit="return show_confirm()">{% csrf_token %}
                         <input type='hidden' name='entry' value="{{ entries.id }}" />
-                        <input type="submit" value="Delete the Reservation"  class="deletelink" name="_delete" />
+                        <input type="submit" value="Delete the reservation"  class="deletelink" name="_delete" />
 
 
                     </form>
