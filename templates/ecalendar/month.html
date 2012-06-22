@@ -50,7 +50,7 @@ function loseFocus()
             <td>
                 <select onkeyup="searchEquip(this.value,{{ year }},{{ month }})" name="equipment_name" id="id_equipment_name" onchange="clickEquipment({{ year }},{{ month }},this)"/>
 			{%if id_eq == entry.id%}
-			<option>Please Choose one...</Option>
+			<option>Please choose one...</Option>
 			{%else%}
 			<option onclick="location='{% url ecalendar.views.month year month %}'">Show all</Option>
 			{%endif%}

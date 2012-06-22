@@ -312,24 +312,25 @@ def mail(user, startdate, enddate, starttime, endtime, eqi, type,is_guest):
     print recipients
     sender = 'maximilian.koch@dkfz.de'
     if (type=="new"):
-        subject = "reservation"
+        subject = "B110 Booking System: reservation"
         if (startdate != enddate):
-            msg_text = "Hello "+ firstname+",\n " "you have booked "+ eqi +" on "+ startdate + " at "+ starttime +" to "+ enddate +" at "+ endtime+"."
+            msg_text = "Hello "+ firstname+",\n " "you have booked\n "+ eqi +"\n on "+ startdate + " at "+ starttime +" to "+ enddate +" at "+ endtime+"."
         else:
-            msg_text = "Hello "+ firstname +",\n " "you have booked "+ eqi +" on "+ startdate + " at "+ starttime +" to "+ endtime+"."
+            msg_text = "Hello "+ firstname +",\n " "you have booked\n "+ eqi +"\n on "+ startdate + " at "+ starttime +" to "+ endtime+"."
     if (type=="change"):
-        subject = "changed"
+        subject = "B110 Booking System: change"
         if (startdate != enddate):
-            msg_text = "Hello "+ firstname +",\n " "you have booked "+ eqi +" on "+ startdate + " at "+ starttime +" to "+ enddate +" at "+ endtime+"."
+            msg_text = "Hello "+ firstname +",\n " "you have booked\n "+ eqi +"\n on "+ startdate + " at "+ starttime +" to "+ enddate +" at "+ endtime+"."
         else:
-            msg_text = "Hello "+ firstname +",\n " "you have booked "+ eqi +" on "+ startdate + " at "+ starttime +" to "+ endtime+"."
+            msg_text = "Hello "+ firstname +",\n " "you have booked\n "+ eqi +"\n on "+ startdate + " at "+ starttime +" to "+ endtime+"."
     if (type=="delete"):
-        subject = "deleting"
+        subject = "B110 Booking System: cancellation"
         if (startdate != enddate):
-            msg_text = "Hello "+ firstname +",\n " "you have deleted your booked "+ eqi +" that you have booked on "+ startdate +" to "+ enddate +"."
+            msg_text = "Hello "+ firstname +",\n " "you have cancelled the following booking,\n "+ eqi +"\n on "+ startdate + " at "+ starttime +" to "+ enddate +" at "+ endtime+"."
         else:
-            msg_text = "Hello "+ firstname +",\n " "you have deleted your booked "+ eqi +" that you have booked on "+ enddate +"."
+            msg_text = "Hello "+ firstname +",\n " "you have cancelled the following booking,\n "+ eqi +"\n on "+ startdate + " at "+ starttime +" to "+ endtime+"."
     msg = MIMEText(msg_text)
+    
     msg['Subject'] = subject
     s = smtplib.SMTP()
     s.connect(smtp_server)
@@ -907,15 +908,17 @@ def delete(request):
 		Entrydate1= p.date
 		Entrydate2 = p.enddate
                 eqEn = p.name
-            Entrydate1=str(Entrydate1)
-            Entrydate2=str(Entrydate2)
-            Entrydate1 = Entrydate1.split(" ")[0]
-            Entrydate2 = Entrydate2.split(" ")[0]
+            usEntrydate1=str(Entrydate1)
+            usEntrydate2=str(Entrydate2)
+            Entrydate1 = usEntrydate1.split(" ")[0]
+            Entrydate2 = usEntrydate2.split(" ")[0]
+            Entrytime1 = usEntrydate1.split(" ")[1]
+            Entrytime2 = usEntrydate2.split(" ")[1]
             Entry.objects.filter(id=Entryid).delete()
             type="delete"
             usEn=User.objects.get(id=request.session['user_ID'])
-            Entrytime1=""
-            Entrytime2=""
+            #Entrytime1=""
+            #Entrytime2=""
 	   # g1 = 0
            # Entryobj= Entry.objects.get(id=Entryid)
             if Entryobj.guest_id != 0 :
