@@ -572,7 +572,7 @@ def dbadd(request):
                 today = strftime("%Y-%m-%d %H:%M:%S", gmtime())
                 nDT = datetime.fromtimestamp(time.mktime(time.strptime(today, time_format)))
                 if sDT>eDT:
-                    errormsg+="\nThe end time is before the start time !"
+                    errormsg+="\nThe end time is before the start time !\n"
                     return add(request,errormsg)
                 if sDT<nDT:
                     errormsg+="\nThe start time is in the past !\n"
@@ -590,7 +590,7 @@ def dbadd(request):
                             print"in"
                             if sDT >= e.date and eDT <= e.enddate:
                                 checknumber += 1
-                                errormsg += eqEn.name + "\nis not available at this time!\n"
+                                errormsg += eqEn.name + "\n\nis not available at this time!\n"
                                 #return add(request, errormsg)
                             elif sDT >= e.date and sDT <= e.enddate and eDT >= e.enddate:
                                 checknumber += 1
