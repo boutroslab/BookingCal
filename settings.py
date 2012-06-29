@@ -3,7 +3,7 @@ import os
 import sys
 import logging
 # put the Django project on sys.path
-path = '/Users/maximiliankoch/PythonSkripte/django/bookingCal'
+path = '/var/www/django/django_projects/bookingCal'
 if path not in sys.path:
     sys.path.append(path)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'bookingCal.settings'
@@ -16,13 +16,6 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'bookingCal.settings'
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-"""logging.basicConfig( 
-    filename="/var/www/django/info.log",
-    filemode="a",
-    level = logging.DEBUG,
-    format= '%(asctime)s %(levelname)s %(message)s',
-)"""
-
 
 ADMINS = (
            ('B110-IT', 'b110-it@dkfz.de'),
@@ -34,9 +27,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'buchung_django', # Or path to database file if using sqlite3.
-        'USER': 'root', # Not used with sqlite3.
-        'PASSWORD': '', # Not used with sqlite3.
-        'HOST': 'localhost', # Set to empty string for localhost. Not used with sqlite3.
+        'USER': 'django', # Not used with sqlite3.
+        'PASSWORD': 'dj4n60', # Not used with sqlite3.
+        'HOST': 'b110-dbserve', # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '', # Set to empty string for default. Not used with sqlite3.
     }
 }
@@ -109,7 +102,7 @@ TEMPLATE_DIRS = (
                  # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
                  # Always use forward slashes, even on Windows.
                  # Don't forget to use absolute paths, not relative paths.
-		 '/Users/maximiliankoch/PythonSkripte/django/bookingCal/templates' 
+		 '/var/www/django/django_templates' 
 	         #'templates'
                  )
 
