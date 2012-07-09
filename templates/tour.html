@@ -1,0 +1,27 @@
+<html>
+<head>
+    {% extends "base.html" %}
+{% block title %}Booking System{% endblock %}
+<link href="http://vjs.zencdn.net/c/video-js.css" rel="stylesheet">
+<script src="http://vjs.zencdn.net/c/video.js"></script>
+</head>
+{% block content %}
+    <h1>How to use the Reservation Management System of the Division B110</h1>
+    <pre>
+This is a short "how to" video for these Booking System! Just click Play!   
+    </pre>
+
+<!--<iframe width="868" height="489" src="/booking/static/main/bookingystem.mov" frameborder="3"></iframe>
+-->
+<video id="my_video_1"  controls
+  preload="auto" width="560" height="315" poster="/booking/static/main/display.jpg"
+  data-setup="{}">
+  <source src="/booking/static/main/bookingsystem.ogv" type='video/ogg ogv'>
+  <source src="/booking/static/main/bookingsystem.mp4" type='video/mp4'>
+  <source src="/booking/static/main/bookingsystem.webm" type='video/webm'>
+</video>
+
+{% endblock %}
+
+</html>
+~              
