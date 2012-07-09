@@ -17,6 +17,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 
+
 ADMINS = (
            ('B110-IT', 'b110-it@dkfz.de'),
           )
@@ -102,7 +103,7 @@ TEMPLATE_DIRS = (
                  # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
                  # Always use forward slashes, even on Windows.
                  # Don't forget to use absolute paths, not relative paths.
-		 '/var/www/django/django_templates' 
+		 '/var/www/django/django_templates'
 	         #'templates'
                  )
 
@@ -115,4 +116,4 @@ INSTALLED_APPS = (
                   'django.contrib.admin',
                   'bookingCal.ecalendar'
              )
-SESSION_COOKIE_AGE = 86400
+SESSION_COOKIE_AGE = 1800
