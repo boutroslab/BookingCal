@@ -7,6 +7,7 @@ from datetime import tzinfo
 import getpass
 from symbol import except_clause
 import time
+import inspect 
 #just for MAC
 #from StdSuites.Type_Names_Suite import null
 from bookingCal.ecalendar.models import Entry
@@ -44,7 +45,7 @@ def reminders(request):
     reminders = Entry.objects.filter(date__year=year, date__month=month,
                                      date__day=day, remind=True)
     tomorrow = datetime.now() + timedelta(days=1)
-    year, month, day = tomorrow.timetuple()[:3]
+    year,/ month, day = tomorrow.timetuple()[:3]
     return list(reminders) + list(Entry.objects.filter(date__year=year, date__month=month,
                                   date__day=day, remind=True))
 
@@ -89,7 +90,6 @@ def month(request, year, month, change=None,eq=None):
     if change == "sort":
         eq = int(eq)
         sort=True
-        print eq
     #apply next/previos change
     if change in ("next", "prev"):
 
@@ -107,7 +107,6 @@ def month(request, year, month, change=None,eq=None):
     cal = calendar.Calendar()
     month_days = cal.itermonthdays(year, month)
     nyear, nmonth, nday = time.localtime()[:3]
-    print "nday", nday
     lst = [[]]
     week = 0
 
@@ -116,8 +115,6 @@ def month(request, year, month, change=None,eq=None):
     for day in month_days:
         entries = current = False   #are there entries for this day; curren day?
         if day:
-            # entries= Entry.objects.filter(date__year<=year, date__month<=month, date__day<=day, enddate__year>=year, enddate__month>=month, enddate__day>=day)
-        # entries= Entry.objects.filter(date__year=year, date__month=month, date__day=day)
 
             # Zeitangabe erzeugen
             fday = day
@@ -199,13 +196,14 @@ def event(request, evid):
 def ldapU(request, username, password):
     c = {}
     c.update(csrf(request))
-    print request 
+    #url from the ldap server 
     server_uri = 'ldap://ad.dkfz-heidelberg.de:389'
 
     # if bind_user and bind_pw is both '' it does an anonymous bind
     bind_user = 'CN=ldap,CN=Users,DC=ad,DC=dkfz-heidelberg,DC=de'
     bind_pw = 'logalvsa'
-
+    
+    #B110
     base_dn = 'OU=Kst-B110,OU=Fsp-B,OU=DKFZ,DC=ad,DC=dkfz-heidelberg,DC=de'
     filter_str = '(CN=%s)'
     searchScope = ldap.SCOPE_SUBTREE
@@ -219,48 +217,33 @@ def ldapU(request, username, password):
 
     ldap.set_option(ldap.OPT_REFERRALS, 0)
 
-    print "Initializing connection to %s ..." % server_uri
     l = ldap.initialize(server_uri)
-    print "LDAP protocol version %d" % l.protocol_version
 
-    print "Binding to directory using bind user %r (and configured password) ..." % bind_user
     l.bind_s(bind_user, bind_pw)
 
     search_filter = filter_str % adUser
 
-    print "Searching under base dn %s for %s ..." % (base_dn, search_filter)
 
     lusers = l.search_s(base_dn, searchScope, search_filter, attrs)
     results = len(lusers)
-    print "Results: %d" % results
 
     ldapIn = False
 
     if results:
-        for dn, ldap_dict in lusers:
-            print "    %s" % dn
         first_dn = lusers[0][0]
-        print "Trying to authenticate with first found dn %s (and configured password) ..." % first_dn
         try:
             l.bind_s(first_dn, adPW)
             ldapIn = True
             for dn,entry in lusers:
                 if dn != None:
-                    print 'Processing',repr(dn)
-                    print entry['sAMAccountName']
-                    print entry['mail']
                     emailad =  entry['mail']
                     fname = entry['displayName']
                     backendAuth(username,fname, emailad)
-            print "Succcessfully bound - whoami says: "
         except ldap.INVALID_CREDENTIALS, err:
             print "LDAP Error: %s" % err
         
    
-    print "Unbinding from directory ..."
     l.unbind()
-    print "-" * 100
-    print "\n"
 
     return ldapIn
 
@@ -294,37 +277,50 @@ def new(request):
         return render_to_response('ecalendar/new.html',c,context_instance=RequestContext(request))
     else:
         return add(request,"")
-    
+
+##
+# Mail function, which Creates a info mail for booking, changing oder cancleling. This function is called by the "dbadd","changeadd" and "delete" functions. The parameters are.
+#
+# @user contains the user object
+# @startdate contains the startday from the booking
+# @enddate -"-            endday    -"-
+# @starttime contains the booking time from the startday
+# @endtime cointains the return time from the endtime
+# @type contains the value like "booking", "changing" oder "deleting" which calls the mail function which mail sould be send.
 def mail(user, startdate, enddate, starttime, endtime, eqi, type,is_guest):
-    print "Mailing recipient"
-    print "the email address is"
-    print type 
     smtp_server = 'localhost'
-    print is_guest
-    print eqi
+   
+    ##
+    # This comment provides documentation for the following
+    # recipients. 
     recipients = user.email
+
+    ##
+    # Is the is_guest param not 0, then will the recipients var replace by the value from the is_guest object
+    # 
     if is_guest != 0:
         recipients=is_guest.email
 	firstname = is_guest.firstname
     else:
         firstname = user.first_name
-    print "recipients"
-    print recipients
+    ##
+    # This comment provides documentation for the following
+    # sender.
     sender = 'maximilian.koch@dkfz.de'
     if (type=="new"):
-        subject = "B110 Booking System: reservation"
+        subject = "Booking System: reservation"
         if (startdate != enddate):
             msg_text = "Hello "+ firstname+",\n " "you have booked\n "+ eqi +"\n on "+ startdate + " at "+ starttime +" to "+ enddate +" at "+ endtime+"."
         else:
             msg_text = "Hello "+ firstname +",\n " "you have booked\n "+ eqi +"\n on "+ startdate + " at "+ starttime +" to "+ endtime+"."
     if (type=="change"):
-        subject = "B110 Booking System: change"
+        subject = "Booking System: change"
         if (startdate != enddate):
             msg_text = "Hello "+ firstname +",\n " "you have booked\n "+ eqi +"\n on "+ startdate + " at "+ starttime +" to "+ enddate +" at "+ endtime+"."
         else:
             msg_text = "Hello "+ firstname +",\n " "you have booked\n "+ eqi +"\n on "+ startdate + " at "+ starttime +" to "+ endtime+"."
     if (type=="delete"):
-        subject = "B110 Booking System: cancellation"
+        subject = "Booking System: cancellation"
         if (startdate != enddate):
             msg_text = "Hello "+ firstname +",\n " "you have cancelled the following booking,\n "+ eqi +"\n on "+ startdate + " at "+ starttime +" to "+ enddate +" at "+ endtime+"."
         else:
@@ -335,64 +331,27 @@ def mail(user, startdate, enddate, starttime, endtime, eqi, type,is_guest):
     s = smtplib.SMTP()
     s.connect(smtp_server)
     s.sendmail(sender, recipients, msg.as_string())
-    print"send"
     s.close()
+
+#the "add" function is check your username in the database and ist looking wethere you are a superuser or not. A superuser can book for guest.
 def add(request,errormsg):
     c = {}
     c.update(csrf(request))
     if request.session.get('ldapU_is_auth'):
         if  request.session.get('user_ID'):
             context=True
-            print "user ID"
-            print request.session['user_ID']
             userID = request.session['user_ID']
-            print userID
             admin=False
             for p in Entry.objects.raw('SELECT U.id,U.is_superuser FROM buchung_django.auth_user as U WHERE U.id=%s',[userID]):
                 is_superuser = p.is_superuser
                 if is_superuser ==1:
 		    admin=True
-            print "LDAP AUTH"
-            print request.session['ldapU_is_auth']
     else:
         return new(request)
-    print errormsg
     entries = Equipment.objects.filter(enabled=True).order_by('name')
     return render_to_response('ecalendar/add.html',{"error_message": errormsg, 'entries':entries,'context':context,'admin': admin },context_instance=RequestContext(request))
 
-def guest(request):
-    c = {}
-    c.update(csrf(request))
-    return render_to_response('ecalendar/guest.html',c, context_instance=RequestContext(request))
-
-def guestReg(request):
-    if request.method == 'POST':
-        password = '123Secret'
-        firstname = request.POST['firstname']
-        lastname = request.POST['lastname']
-        firstName = "GUEST:  "
-        firstName += firstname
-        email = request.POST['email']
-        username = firstname +"_" +lastname
-        user = authenticate(username=username, password=password)
-        if user is None:
-            user = User.objects.create_user(username, email, password)
-            user.first_name = firstName
-            user.last_name = lastname
-            user.groups.add(1)
-            user.is_active = True
-            user.is_staff = False
-            user.save()
-        check = User.objects.get(username=username)
-        if check:
-            request.session['ldapU_is_auth'] = True
-            request.session['user_ID'] = check.id
-            return add(request,"")
-        else:
-            return guest(request)
-    else:
-         return guest(request)
-
+#the "Check" function ist checking the username and password with the ldap
 def check(request):
     c = {}
     c.update(csrf(request))
@@ -402,12 +361,7 @@ def check(request):
         if username and password:
             if not request.session.get('ldapU_is_auth'):
                 if ldapU(request, username=username, password=password):
-#                    backendAuth(username)
                     check = User.objects.get(username=username)
-		    print "Checkinnnng"
-		    print check.id
-		    print "EMAIL"
-                    print ldapU(request, username=username, password=password)
                     if check:
                         request.session['user_ID'] = check.id
                         request.session['ldapU_is_auth'] = True
@@ -429,10 +383,12 @@ def check(request):
     else:
         return new(request)
 
+#the "dbadd" function is the main function for the booking. because the dbadd create your book or call u what is wrong, for example that the choosed equipment is allready booked at this time. 
 def dbadd(request):
     c = {}
     c.update(csrf(request))
     errormsg=""
+#noFail is everytime true if you want to book a bookable equipment
     noFail = True
     mailList = []
     checknumber = 0
@@ -453,18 +409,11 @@ def dbadd(request):
             regex2 = re.compile("\A[0-2]\d:[0-5]\d$")
             regex = re.compile("\A[0-2]\d:[0-5]\d:[0-5]\d\Z$")
             is_guest = request.POST['forwho']
-            print is_guest
+#is_guest is the boolean value which contains the information is it a guest or not 
             if is_guest == "forguest":
 	        g_firstname=request.POST['firstname']
                 g_surname=request.POST['lastname']
                 g_mail=request.POST['email']
-	    else: 
-	        print "ist b110"
-	   # if firstname=="":
- 	    #    print"ist leer"
-        #    print g_firstname
-	 #   print g_surname
-          #  print g_mail
             if regex2.search(Entrytime1):
                 Entrytime1+=":00"
             if regex2.search(Entrytime2):
@@ -477,30 +426,16 @@ def dbadd(request):
 
             Eid = request.POST['equipment']
 	    EidList = Eid.split(",")
-	    print EidList
-	    print len(EidList)
 	    roundCount = 0
-            print("hier ist die Eid")
-	    print Eid
-	    test = len(EidList)+1
-	    print len(EidList) 
 	    errorlist = ""
-	    r = 0
-	   # for Eid in EidList:
 	    for Eid in EidList:
 		roundCount += 1
-		print ("roundCount")
-		print len(EidList)
-		print roundCount
                 myEquipList=[Eid]
                 if not anzahlEquip =="":
                     countEquip = int(anzahlEquip)
                     equipSame=0
                     for i in range(2,countEquip+1):
-                        print "anzahl"
-                        print i
                         equiPostName='equipment'+str(i)
-                        print "->"+equiPostName
                         equip =request.POST[equiPostName]
                         if equip =="":
                             inputcheck += 1
@@ -513,9 +448,7 @@ def dbadd(request):
                             return add(request,"\nThe Equipments are the same!\nPlease select another one!")
                         else:
                             myEquipList.append(equip)
-                for i in myEquipList:
-                        print"Equip No"
-                        print i
+#is_labmember is the boolean value which contains the information is it a labmember book or is it a guest book
 	        is_labmember="true"
 	        if is_guest =="forguest":
 		    is_labmember = "false"
@@ -538,9 +471,6 @@ def dbadd(request):
                     errormsg+="\nYou haven't entered any equipment !\n"
 
 
-#            if Entrytitle =="" :
-#                inputcheck += 1
-#                errormsg+="\nThe title is missing !\n"
                 if Entrydate1 =="" :
                     inputcheck += 1
                     errormsg+="\nThe start date is missing !\n"
@@ -578,32 +508,23 @@ def dbadd(request):
                     errormsg+="\nThe start time is in the past !\n"
                     return add(request,errormsg)
                 for i in myEquipList:
-                    print"Equip No datecheck"
                 
-    #            Checknumber is for the errorcounter
-                    #checknumber = 0
 		    
 		    eqEn=Equipment.objects.get(id=Eid)
                     for e in Entry.objects.raw('SELECT * FROM ecalendar_entry'):
-#                    print str(i) +' = ' + str(e.equipment_id)
                         if str(i) == str(e.equipment_id):
-                            print"in"
                             if sDT >= e.date and eDT <= e.enddate:
                                 checknumber += 1
                                 errormsg += eqEn.name + "\n\nis not available at this time!\n"
-                                #return add(request, errormsg)
                             elif sDT >= e.date and sDT <= e.enddate and eDT >= e.enddate:
                                 checknumber += 1
                                 errormsg += "\nThe Equipment is not available at this time!\n"
-                                #return add(request, errormsg)
                             elif sDT <= e.date and eDT >= e.date and eDT <= e.enddate:
                                 checknumber += 1
                                 errormsg += "\nThe Equipment is not available at this time!\n"
-                                #return add(request, errormsg)
                             elif sDT <= e.date and eDT >= e.enddate:
                                 checknumber += 1
                                 errormsg += "\nThe Equipment is not available at this time!\n"
-                                #return add(request, errormsg)
                 
                     for equipm in Equipment.objects.raw('SELECT * FROM ecalendar_equipment'):
                         if equipm.id == i:
@@ -615,20 +536,10 @@ def dbadd(request):
 #            when the errorcounter is more than 0 the Reservation is not available
                     for i in myEquipList:
 			if checknumber == 0:
-                            print"Now the db input"
-                            print"Equip No"
-                            print i
-			    print ("checknumber")
-			    print checknumber
-                            print request.session.keys()
                             eqEn=Equipment.objects.get(id=i)
                             usEn=User.objects.get(id=request.session['user_ID'])
-                            print eqEn
-                            print usEn
-                            print "My Name is"
-		            print usEn
-		            print "My mail is"
                             if is_labmember=="true":
+				#g1 is the guest object which contains the data from the guest. If you want to book something for your own g1==0, else g1 contains all the information about the guest
 			        g1 = 0
 		                eNew= Entry(
                                     equipment = eqEn,
@@ -644,12 +555,6 @@ def dbadd(request):
                                 g1.save()
 			
                                 guEn =  g1.id
-			        print "g1.id"
-		   	        print g1.id
-			        print "guen"
-				print g1.email
-			        print guEn
-			        print "g1 creator"
 		                eNew= Entry(
                                     equipment = eqEn,
                                     title = Entrytitle,
@@ -661,24 +566,24 @@ def dbadd(request):
                             )
 	                     
                             eNew.save()
+                            #add the equipment name to the mailList
 			    mailList.append(eqEn.name)
-			    print ("print mailList")
-			    print str(mailList)
+                            #convert the mailList List to a String separated by comma
 			    strmailList=", ".join(mailList)
-			    print strmailList 
+                            #information for the mail()
      	 	            type="new"
-                            #mail(usEn, Entrydate1, Entrydate2, Entrytime1, Entrytime2, eqEn, type, g1)
                             Entrydate1
-                            b=Entrydate1.split("-")
-                            year = b[0]
-                            month = b[1]
+                            splitedDate=Entrydate1.split("-")
+                            year = splitedDate[0]
+                            month = splitedDate[1]
+			    #if roundCount has the same length like the List of all choosen Equipments, will be call the mail()
 			    if roundCount == len(EidList):
 			        mail(usEn, Entrydate1, Entrydate2, Entrytime1, Entrytime2, strmailList, type, g1)
 		        else:
-                            print ("Hier ist der Fehler")
-                            print eqEn.name
+			    #if nowhere happend any fail, then ist checknumber==0 and noFail is False
                             checknumber = 0
 			    noFail=False
+			#if noFail == False and roundCount == the length of the EidList is this function finsh.
 		        if noFail == False: 
                             if roundCount == len(EidList):
                                 return add(request, errormsg)
@@ -688,13 +593,14 @@ def dbadd(request):
         return render_to_response('ecalendar/add.html',{'context':context}, context_instance=RequestContext(request))
 
 
-
+#the history function is creating the history entries
 def history(request):
     if request.session.get('ldapU_is_auth'):
         context=True
+	#usEn is getting the User object which contains the information which equipment has anybody booked
         usEn=User.objects.get(id=request.session['user_ID'])
 	admin=False
-	print usEn.is_superuser
+	#if usEn.is_superuser == 1, then you'r a superuser which kann delete or change the bookings, which he has made for a guest. otherwihle you can just delete oder change your own bookings.
 	if usEn.is_superuser == 1:
 	    admin=True
         if usEn:
@@ -705,12 +611,14 @@ def history(request):
     else:
         return render_to_response('ecalendar/new.html', context_instance=RequestContext(request))
 
+#the logout function is just for the logout ;) 
 def logout(request):
     del request.session['ldapU_is_auth']
     del request.session['user_ID']
     logout_(request)
     return render_to_response('ecalendar/index.html', context_instance=RequestContext(request))
 
+#the change function is for the rendering form the change page values.
 def change(request, evid):
     if request.session.get('ldapU_is_auth'):
         context=True
@@ -718,11 +626,8 @@ def change(request, evid):
     splitstring= evid.split('|');
     evid=splitstring[0]
     if len(splitstring) >1:
-        print len(splitstring)
         errormsg=splitstring[1]
 
-    print evid
-    print errormsg
     if evid:
         entries = Entry.objects.get(id=evid)
         start = entries.date
@@ -735,7 +640,7 @@ def change(request, evid):
 
     return render_to_response("ecalendar/change.html", {"error_message": errormsg, 'entries':entries,'entries2':entries2,'startdate':sd,'starttime':st,'enddate':ed,'endtime':et,'context':context },context_instance=RequestContext(request))
             
-            
+#the changeadd function is adding your changed values to the database and is check them for any fail.             
 def changeadd(request):
     if request.session.get('ldapU_is_auth'):
         context=True
@@ -745,7 +650,7 @@ def changeadd(request):
 
     if request.method == 'POST':
         if request.session.get('ldapU_is_auth'):
-
+            #checking the fields, of the Changeentry page
             Entryid = request.POST['entry']
             errormsg=Entryid+"|"
             Eid = request.POST['equipment']
@@ -771,9 +676,6 @@ def changeadd(request):
             if Eid =="" :
                 inputcheck += 1
                 errormsg+="\nThe equipment ID is missing !\n"
-#            if Entrytitle =="" :
-#                inputcheck += 1
-#                errormsg+="\nThe title is missing !\n"
             if Entrydate1 =="" :
                 inputcheck += 1
                 errormsg+="\nThe start date is missing !\n"
@@ -812,7 +714,6 @@ def changeadd(request):
             checknumber = 0
             for e in Entry.objects.raw('SELECT * FROM ecalendar_entry'):
                 if str(e.id) !=Entryid:
-                    print str(e.id) +" != "+ Entryid
                      
 
                     if Eid == str(e.equipment_id):
@@ -834,8 +735,6 @@ def changeadd(request):
                             checknumber += 1
                             errormsg+="\nThe Equipment is not available at this time!\n"
                             return change(request,errormsg)
-                else:
-                    print "The selected Entry"
             for equipm in Equipment.objects.raw('SELECT * FROM ecalendar_equipment'):
                 if equipm.id == Eid:
                     if equipm.enabled == False:
@@ -847,12 +746,9 @@ def changeadd(request):
             if checknumber > 0:
                 return delete(request,errormsg)
             else:
-                print"Now the db input"
-                print request.session['user_ID']
+                
                 eqEn=Equipment.objects.get(id=Eid)
                 usEn=User.objects.get(id=request.session['user_ID'])
-                print eqEn
-                print usEn
 		g1=0
 		Entryobj= Entry.objects.get(id=Entryid)
 		if Entryobj.guest_id != 0 :
@@ -879,10 +775,10 @@ def changeadd(request):
                         creator = usEn,
                         guest = guEn
                        )
+		#information for the mail()
         	type="change"
 		mailList.append(eqEn.name)
                 strmailList=", ".join(mailList)
-                print strmailList
                 mail(usEn, Entrydate1, Entrydate2, Entrytime1, Entrytime2, strmailList, type, g1)
                 return render_to_response('ecalendar/changed.html',{'context':context}, context_instance=RequestContext(request))
         else:
@@ -890,6 +786,7 @@ def changeadd(request):
     else:
         return render_to_response('ecalendar/add.html',{'context':context}, context_instance=RequestContext(request))
 
+#the delete function is just cancelation your booking, and delete it from the database
 def delete(request):
     c = {}
     c.update(csrf(request))
@@ -898,13 +795,12 @@ def delete(request):
     if request.method == 'POST':
         if request.session.get('ldapU_is_auth'):
             Entryid = request.POST['entry']
-            test = int(Entryid)
+            eNid = int(Entryid)
             g1 = 0
 	    Entryobj= Entry.objects.get(id=Entryid)
             if Entryobj.guest_id != 0 :
                 g1=Entryobj.guest
-            print test
-            for p in  Entry.objects.raw('SELECT ecalendar_entry.id,name, date, enddate FROM ecalendar_entry INNER JOIN ecalendar_equipment ON ecalendar_entry.equipment_id = ecalendar_equipment.id WHERE ecalendar_entry.id=%s',[test]):
+            for p in  Entry.objects.raw('SELECT ecalendar_entry.id,name, date, enddate FROM ecalendar_entry INNER JOIN ecalendar_equipment ON ecalendar_entry.equipment_id = ecalendar_equipment.id WHERE ecalendar_entry.id=%s',[eNid]):
 		Entrydate1= p.date
 		Entrydate2 = p.enddate
                 eqEn = p.name
@@ -915,19 +811,11 @@ def delete(request):
             Entrytime1 = usEntrydate1.split(" ")[1]
             Entrytime2 = usEntrydate2.split(" ")[1]
             Entry.objects.filter(id=Entryid).delete()
+            #information for the mail()
             type="delete"
             usEn=User.objects.get(id=request.session['user_ID'])
-            #Entrytime1=""
-            #Entrytime2=""
-	   # g1 = 0
-           # Entryobj= Entry.objects.get(id=Entryid)
             if Entryobj.guest_id != 0 :
                 g1=Entryobj.guest
-	    print usEn.first_name
-            print usEn.email
-            print Entrydate1
-            print Entrydate2
-            print eqEn 
             mail(usEn, Entrydate1, Entrydate2, Entrytime1, Entrytime2, eqEn, type,g1)
             return render_to_response('ecalendar/delete.html',{'context':context}, context_instance=RequestContext(request))
 
@@ -936,37 +824,3 @@ def delete(request):
     else:
           return render_to_response('ecalendar/new.html',{'context':context}, context_instance=RequestContext(request))
 
-def ajax_search_equip(request):
-    if request.is_ajax():
-       if request.method == 'POST':
-            post = request.POST.copy()
-            if post.has_key('name') :
-                print 'Raw Data: "%s"' % request.raw_post_data
-                equipment = []
-                eName = post['name']
-                print eName
-                print "AJAX POOST"
-
-                equipment = Equipment.objects.filter(name__contains=eName)
-                print equipment
-                for e in equipment:
-                    print e.name
-
-                json =serializers.serialize('json', equipment, ensure_ascii=False)
-                return HttpResponse(json, mimetype="application/json")
-
-    else:
-      entries.append("NO AJAX")
-
-    return HttpResponse()
-
-#                another opinion to search
-#                a = Equipment.objects.all()
-#                regex=re.compile("\w*%s\w*" % name)
-#                for en in a:
-#                    nameEq = en.name
-#                    r = regex.search(nameEq)
-#                    if r:
-#                        check = Equipment.objects.get(id=en.id)
-#                        equipment.append(check)
-#                equipment=name

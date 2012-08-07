@@ -9,8 +9,6 @@ urlpatterns = patterns('ecalendar.views',
                        (r"^day/(\d+)/(\d+)/(\d+)/$", "day"),
                        (r"^event/(\d+)/$", "event"),
                        (r"^new/$", "new"),
-                       (r"^guest/$", "guest"),
-                       (r"^new/guestReg/$", "guestReg"),
                        (r"^new/add/$", "add"),
                        (r"^new/check/$", "check"),
                        (r"^new/dbadd/$", "dbadd"),
@@ -19,7 +17,4 @@ urlpatterns = patterns('ecalendar.views',
                        (r"^delete/$", "delete"),
                        (r"^logout/$", "logout"),
                        (r"^changeadd/$", "changeadd"),
-                       (r'^ajax_search_equip$',"ajax_search_equip"),
- 
-
 )

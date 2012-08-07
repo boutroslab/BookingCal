@@ -10,6 +10,8 @@ from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 
 class Guest(models.Model):
+    # Test 123 Guest class blablabla
+
     firstname = models.CharField(max_length=40, blank=False)
     surname = models.CharField(max_length=40, blank=False)
     email = models.CharField(max_length=40, blank=False)
@@ -33,6 +35,8 @@ class Entry(models.Model):
     guest = models.ForeignKey(Guest , blank= False, null=False)
 
     def equipment_name(self):
+        # this is the equipment_name function
+
         return self.equipment.name
     equipment_name.admin_order_field = 'equipment__name'
 
