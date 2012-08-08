@@ -2,16 +2,14 @@
 import os
 import sys
 import logging
-# put the Django project on sys.path
-path = '/Users/maximiliankoch/PythonSkripte/django/bookingCal/'
-if path not in sys.path:
-    sys.path.append(path)
-os.environ['DJANGO_SETTINGS_MODULE'] = 'bookingCal.settings'
-
-
+from os.path import abspath, dirname
 
 #import django.core.handlers.wsgi
 #application = django.core.handlers.wsgi.WSGIHandler()
+
+path =  abspath(dirname(dirname(__file__)))
+template_dir = path + "/templates"
+print "myPATH: "+template_dir
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -96,14 +94,14 @@ MIDDLEWARE_CLASSES = (
                       'django.contrib.messages.middleware.MessageMiddleware',
                       )
 
-ROOT_URLCONF = 'bookingCal.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
                  # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
                  # Always use forward slashes, even on Windows.
                  # Don't forget to use absolute paths, not relative paths.
-		 '/Users/maximiliankoch/PythonSkripte/django/bookingCal/templates' 
-	         #'templates'
+                 template_dir 
+                 #'templates'
                  )
 
 INSTALLED_APPS = (
@@ -113,6 +111,6 @@ INSTALLED_APPS = (
                   'django.contrib.sites',
                   'django.contrib.messages',
                   'django.contrib.admin',
-                  'bookingCal.ecalendar'
+                  'ecalendar'
              )
 SESSION_COOKIE_AGE = 86400

@@ -10,9 +10,9 @@ import time
 import inspect 
 #just for MAC
 #from StdSuites.Type_Names_Suite import null
-from bookingCal.ecalendar.models import Entry
-from bookingCal.ecalendar.models import Equipment
-from bookingCal.ecalendar.models import Guest
+from ecalendar.models import Entry
+from ecalendar.models import Equipment
+from ecalendar.models import Guest
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout as logout_
 from django.contrib.auth.decorators import login_required
@@ -39,13 +39,14 @@ from django.core.mail import EmailMessage
 mnames = "January February March April May June July August September October November December"
 mnames = mnames.split()
 _email = ""
+
 def reminders(request):
     """Return the list of reminders for today and tomorrow."""
     year, month, day = time.localtime()[:3]
     reminders = Entry.objects.filter(date__year=year, date__month=month,
                                      date__day=day, remind=True)
     tomorrow = datetime.now() + timedelta(days=1)
-    year,/ month, day = tomorrow.timetuple()[:3]
+    year, month, day = tomorrow.timetuple()[:3]
     return list(reminders) + list(Entry.objects.filter(date__year=year, date__month=month,
                                   date__day=day, remind=True))
 
@@ -278,16 +279,24 @@ def new(request):
     else:
         return add(request,"")
 
-##
-# Mail function, which Creates a info mail for booking, changing oder cancleling. This function is called by the "dbadd","changeadd" and "delete" functions. The parameters are.
-#
-# @user contains the user object
-# @startdate contains the startday from the booking
-# @enddate -"-            endday    -"-
-# @starttime contains the booking time from the startday
-# @endtime cointains the return time from the endtime
-# @type contains the value like "booking", "changing" oder "deleting" which calls the mail function which mail sould be send.
+
 def mail(user, startdate, enddate, starttime, endtime, eqi, type,is_guest):
+    """
+    Mail function, which Creates a info mail for booking, changing oder cancleling. 
+    This function is called by the "dbadd","changeadd" and "delete" functions. The parameters are.
+    
+    
+    
+    
+    
+    @param user: contains the user object
+    @param startdate: contains the startday from the booking
+    @param enddate: -"-            endday    -"-
+    @param starttime: contains the booking time from the startday
+    @param endtime: cointains the return time from the endtime
+    @param type: contains the value like "booking", "changing" oder "deleting" which calls the mail function which mail sould be send.
+    @param is_guest: this boolean value defines if the booking mail should be sent to a normal user or to a guest user
+    """
     smtp_server = 'localhost'
    
     ##

@@ -15,6 +15,8 @@ sudo apt-get install python-setuptools python-dev build-essential mysql-server p
 sudo easy_install pip
 sudo pip install --upgrade virtualenv
 sudo pip install django
+sudo pip install python-ldap
+sudo pip install smtp
 sudo apt-get install apache2-threaded-dev 
 download  latest http://code.google.com/p/modwsgi/
 #e.g.
@@ -101,10 +103,46 @@ sudo chmod 777 /var/www/django/info.log
 #maybe now you need to copy over the websrv db etc.
 
 
+--
+Howto make it run on mac os x lion eclipse and for developing it, you need
+install eclipse
+install subversion plugin for eclipse
+install pydev plugin for eclipse
+
+easy_install pip 
+install pip
+install django using pip: "pip install django"
+install mysql support for python: "sudo pip install MySQL-python"
+install epydoc using pip:  "pip install epydoc"
+install python ldap module for Mac Os X Lion: "sudo pip install python-ldap==2.3.13"
+??somehow install postfix on mac os x lion to work with smtplib??  dont know yet
+
+check out booking cal via svn in eclipse using svn plugin and set it as a pydev->django project
+go to eclipse->preferences->pydev->interpreter python->open Libraries tab, click "Auto config", mark everything, click "Apply"
+go to eclipse->preferences->pydev->interpreter python->open environment tab, enter as variable "DYLD_LIBRARY_PATH" and as value "/usr/local/mysql/lib"
+
+
+generate sourcecode documenation using epydoc the following way, epydoc needs the location of all the modules of your project and 
+the django settings file, so setup following environment variables:
+
+export PYTHONPATH=/Volumes/Mac_HDD_2/Users/oliverpelz/Documents/workspace/bookingCalPyProject:$PYTHONPATH
+export DJANGO_SETTINGS_MODULE=bookingCalPython.settings
+e.g. cd bookingCalPyProject/ecalendar
+#first check if running will work successfully:
+epydoc -v --check views.py
+
+#then run it for real and generate it in output dir e.g. ecalendar_docs:
+epydoc -v --html views.py -o ecalendar_docs
+
+#general information on how to document your subroutines and classes etc: http://epydoc.sourceforge.net/epydoc.html#a-brief-introduction
+
 
 #Main sources for this instruction:
 #http://blog.stannard.net.au/2010/12/11/installing-django-with-apache-and-mod_wsgi-on-ubuntu-10-04/
 #http://grok.zope.org/documentation/tutorial/installing-and-setting-up-grok-under-mod-wsgi/installing-and-configuring-mod-wsgi
 #http://www.saltycrane.com/blog/2010/02/how-install-pip-ubuntu/
+
+#http://epydoc.sourceforge.net/epydoc.html
+
 # some forum threads and newsgroup entries
 
