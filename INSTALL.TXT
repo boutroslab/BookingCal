@@ -104,7 +104,8 @@ sudo chmod 777 /var/www/django/info.log
 
 
 --
-Howto make it run on mac os x lion eclipse and for developing it, you need
+=======================
+Howto make it run on mac os x lion eclipse and for developing it LOCALLY, you need
 install eclipse
 install subversion plugin for eclipse
 install pydev plugin for eclipse
@@ -135,6 +136,9 @@ epydoc -v --check views.py
 epydoc -v --html views.py -o ecalendar_docs
 
 #general information on how to document your subroutines and classes etc: http://epydoc.sourceforge.net/epydoc.html#a-brief-introduction
+
+SEtting up the mailserver functionality under Lion:
+MAX :) hier bitte !
 
 
 #Main sources for this instruction:

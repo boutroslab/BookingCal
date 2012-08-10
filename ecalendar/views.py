@@ -14,6 +14,7 @@ from ecalendar.models import Entry
 from ecalendar.models import Equipment
 from ecalendar.models import Guest
 from django.contrib.auth import authenticate, login
+from django.conf import settings
 from django.contrib.auth import logout as logout_
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -40,7 +41,29 @@ mnames = "January February March April May June July August September October No
 mnames = mnames.split()
 _email = ""
 
+def x_intercept(m, b):
+    """
+    Return the x intercept of the line M{y=m*x+b}.  The X{x intercept}
+    of a line is the point at which it crosses the x axis (M{y=0}).
+
+    This function can be used in conjuction with 
+    find an arbitrary function's zeros.
+
+    @type  m: number
+    @param m: The slope of the line.
+    @type  b: number
+    @param b: The y intercept of the line.  The X{y intercept} of a
+              line is the point at which it crosses the y axis (M{x=0}).
+    @rtype:   number
+    @return:  the x intercept of the line M{y=m*x+b}.
+    """
+    return -b/m
+
 def reminders(request):
+    """
+
+    @param request: xxxx
+    """
     """Return the list of reminders for today and tomorrow."""
     year, month, day = time.localtime()[:3]
     reminders = Entry.objects.filter(date__year=year, date__month=month,
@@ -54,6 +77,7 @@ def reminders(request):
 
 
 def main(request, year=None):
+
     """Main listing years and months; three Year per Page """
     # prev /next years
 
@@ -85,7 +109,9 @@ def main(request, year=None):
                               reminders=reminders(request),request=request,context=context), context_instance=RequestContext(request))
 
 def month(request, year, month, change=None,eq=None):
-    """Listinng of days in 'month'. """
+
+    """Listing of days in 'month'. """
+    
     year, month = int(year), int(month)
     sort=False
     if change == "sort":
@@ -158,6 +184,10 @@ def month(request, year, month, change=None,eq=None):
     return render_to_response("ecalendar/month.html", dict(year=year,id_eq=eq,month=month, month_days=lst, mname=mnames[month-1],equipmentName=equipname,request=request,context=context,equipment=equipment), context_instance=RequestContext(request))
 
 def day(request, year, month, day, eq=None):
+    """
+
+    @param request: xxxx
+    """
     year, month, day = int(year), int(month), int(day)
 
     if day:
@@ -185,6 +215,11 @@ def day(request, year, month, day, eq=None):
     return render_to_response("ecalendar/day.html", dict(year=year, month=month, day=day, entries=entries ,request=request,context=context,equipment=equipment), context_instance=RequestContext(request))
 
 def event(request, evid):
+    """ 
+
+
+    @param request: xxxx
+    """
     if request.session.get('ldapU_is_auth'):
         context=True
     else:
@@ -195,6 +230,12 @@ def event(request, evid):
     return render_to_response("ecalendar/event.html", dict(entries=entries ,request=request,context=context), context_instance=RequestContext(request))
 
 def ldapU(request, username, password):
+    """
+
+    
+    @param username: username is your LDAP username
+    @param password: password is your LDAP password
+    """
     c = {}
     c.update(csrf(request))
     #url from the ldap server 
@@ -249,6 +290,10 @@ def ldapU(request, username, password):
     return ldapIn
 
 def backendAuth(username,name, mail):
+    """
+
+    @param request: xxxx
+    """
     password = '123Secret'
     name[0] = name[0].replace(",","")
     name_list = name[0].split(' ')
@@ -272,6 +317,10 @@ def backendAuth(username,name, mail):
         return
 
 def new(request):
+    """
+
+    @param request: xxxx
+    """
     c = {}
     c.update(csrf(request))
     if not request.session.get('ldapU_is_auth'):
@@ -288,34 +337,49 @@ def mail(user, startdate, enddate, starttime, endtime, eqi, type,is_guest):
     
     
     
-    
+    @type user: object
     @param user: contains the user object
-    @param startdate: contains the startday from the booking
+    @type startdate: string
+    @param  startdate: contains the startday from the booking
+    @type enddate: string
     @param enddate: -"-            endday    -"-
+    @type starttime: string
     @param starttime: contains the booking time from the startday
+    @type endtime: string
     @param endtime: cointains the return time from the endtime
+    @type type: string
     @param type: contains the value like "booking", "changing" oder "deleting" which calls the mail function which mail sould be send.
+    @type is_guest: boolean
     @param is_guest: this boolean value defines if the booking mail should be sent to a normal user or to a guest user
     """
-    smtp_server = 'localhost'
-   
-    ##
-    # This comment provides documentation for the following
-    # recipients. 
+    smtp_server=getattr(settings, 'SMTP_SERVER', 'default_value')
+    """@var: This is an instance variable."""
+
+
+    """
+    This comment provides documentation for the following
+    recipients.
+    """ 
     recipients = user.email
 
-    ##
-    # Is the is_guest param not 0, then will the recipients var replace by the value from the is_guest object
-    # 
+
     if is_guest != 0:
+    
         recipients=is_guest.email
 	firstname = is_guest.firstname
     else:
         firstname = user.first_name
-    ##
-    # This comment provides documentation for the following
-    # sender.
-    sender = 'maximilian.koch@dkfz.de'
+    """
+    This comment mail.is_guest provides documentation for the following
+    sender.
+    """
+    #: docstring for sender
+    sender = getattr(settings, 'SENDER_MAIL', 'default_value')
+    """
+    views.sender This comment provides documentation for the following
+    recipients.
+    
+    """ 
     if (type=="new"):
         subject = "Booking System: reservation"
         if (startdate != enddate):
@@ -342,8 +406,17 @@ def mail(user, startdate, enddate, starttime, endtime, eqi, type,is_guest):
     s.sendmail(sender, recipients, msg.as_string())
     s.close()
 
-#the "add" function is check your username in the database and ist looking wethere you are a superuser or not. A superuser can book for guest.
 def add(request,errormsg):
+    """
+    The "add" function is check that your username in the database and is looking wethere you are a superuser or not. 
+    A superuser can book for guest.
+
+    
+    
+    
+    @param request: xxxx
+    @param errormsg: xxxx
+    """
     c = {}
     c.update(csrf(request))
     if request.session.get('ldapU_is_auth'):
@@ -360,8 +433,15 @@ def add(request,errormsg):
     entries = Equipment.objects.filter(enabled=True).order_by('name')
     return render_to_response('ecalendar/add.html',{"error_message": errormsg, 'entries':entries,'context':context,'admin': admin },context_instance=RequestContext(request))
 
-#the "Check" function ist checking the username and password with the ldap
+
 def check(request):
+    """
+    The "Check" function is checking the username and password with the ldap.
+
+
+    
+    @param request: xxxx
+    """
     c = {}
     c.update(csrf(request))
     if request.method == 'POST':
@@ -392,8 +472,16 @@ def check(request):
     else:
         return new(request)
 
-#the "dbadd" function is the main function for the booking. because the dbadd create your book or call u what is wrong, for example that the choosed equipment is allready booked at this time. 
 def dbadd(request):
+    """
+    The "dbadd" function is the main function for the booking. because the dbadd create your book or call u what is wrong, 
+    for example that the choosed equipment is allready booked at this time. 
+
+
+    @param request: xxxx
+    @rtype:   page
+    @return:  return the confirmation that you have booked this equipment
+    """
     c = {}
     c.update(csrf(request))
     errormsg=""
@@ -418,7 +506,7 @@ def dbadd(request):
             regex2 = re.compile("\A[0-2]\d:[0-5]\d$")
             regex = re.compile("\A[0-2]\d:[0-5]\d:[0-5]\d\Z$")
             is_guest = request.POST['forwho']
-#is_guest is the boolean value which contains the information is it a guest or not 
+            """is_guest is the boolean value which contains the information is it a guest or not """
             if is_guest == "forguest":
 	        g_firstname=request.POST['firstname']
                 g_surname=request.POST['lastname']
@@ -602,8 +690,17 @@ def dbadd(request):
         return render_to_response('ecalendar/add.html',{'context':context}, context_instance=RequestContext(request))
 
 
-#the history function is creating the history entries
 def history(request):
+    """
+    The history function is creating the history entries
+ 
+
+
+    @param request: xxxx
+    @rtype:   page
+    @return:  return a page with all booking which u ever have made
+    """
+    
     if request.session.get('ldapU_is_auth'):
         context=True
 	#usEn is getting the User object which contains the information which equipment has anybody booked
@@ -620,15 +717,32 @@ def history(request):
     else:
         return render_to_response('ecalendar/new.html', context_instance=RequestContext(request))
 
-#the logout function is just for the logout ;) 
 def logout(request):
+    """
+    The logout function is just for the logout ;)  
+
+
+    @param request: xxxx
+    @rtype:   page
+    @return:  return the index page as sign that you logged out
+    """
+   
     del request.session['ldapU_is_auth']
     del request.session['user_ID']
     logout_(request)
     return render_to_response('ecalendar/index.html', context_instance=RequestContext(request))
 
-#the change function is for the rendering form the change page values.
+
 def change(request, evid):
+    """
+    The change function is for the rendering form the change page values.
+ 
+
+
+    @param request: xxxx
+    @rtype:   page
+    @return:  return the values from a entry which you had made on a page
+    """
     if request.session.get('ldapU_is_auth'):
         context=True
     errormsg=""
@@ -649,8 +763,17 @@ def change(request, evid):
 
     return render_to_response("ecalendar/change.html", {"error_message": errormsg, 'entries':entries,'entries2':entries2,'startdate':sd,'starttime':st,'enddate':ed,'endtime':et,'context':context },context_instance=RequestContext(request))
             
-#the changeadd function is adding your changed values to the database and is check them for any fail.             
+
 def changeadd(request):
+    """
+    The changeadd function is adding your changed values to the database and is check them for any fail.             
+ 
+
+
+    @param request: xxxx   
+    @rtype:   page
+    @return:  return the confirmation that you have changed this entry
+    """
     if request.session.get('ldapU_is_auth'):
         context=True
     mailList=[]
@@ -795,8 +918,17 @@ def changeadd(request):
     else:
         return render_to_response('ecalendar/add.html',{'context':context}, context_instance=RequestContext(request))
 
-#the delete function is just cancelation your booking, and delete it from the database
+
 def delete(request):
+    """
+    The delete function is just cancelation your booking, and delete it from the database
+ 
+
+
+    @param request: xxxx
+    @rtype:   page
+    @return:  return the confirmation that you have deleted this entry
+    """
     c = {}
     c.update(csrf(request))
     if request.session.get('ldapU_is_auth'):

@@ -11,6 +11,7 @@ path =  abspath(dirname(dirname(__file__)))
 template_dir = path + "/templates"
 print "myPATH: "+template_dir
 
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -114,3 +115,8 @@ INSTALLED_APPS = (
                   'ecalendar'
              )
 SESSION_COOKIE_AGE = 86400
+
+#The mail adress which send the mail to the User
+SENDER_MAIL="b110-booking-system@dkfz-heidelberg.de"
+#The used SMTP Server
+SMTP_SERVER = 'mailhost.dkfz-heidelberg.de:25'
