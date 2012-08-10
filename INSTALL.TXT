@@ -137,8 +137,36 @@ epydoc -v --html views.py -o ecalendar_docs
 
 #general information on how to document your subroutines and classes etc: http://epydoc.sourceforge.net/epydoc.html#a-brief-introduction
 
-SEtting up the mailserver functionality under Lion:
-MAX :) hier bitte !
+#Setting up the mailserver functionality under Lion:
+
+#1.	Create in the directory  /etc/postfix/ a file which called sasl_passwd. (sudo vi sasl_passed)
+#2.	Open this file and add mailhost.dkfz-heidelberg.de AD-Name:AD-Passwort
+#3.	After that  save an close this file
+#4.	Than type in the terminal postmap /etc/postfix/sasl_passwd
+#5.	After that add the following lines to /etc/postfix/main.cf
+
+	myorigin = mailhost.dkfz-heidelberg.de
+	myhostname = mailer.$myorigin
+	smtpd_sender_restrictions = permit_inet_interfaces
+	# smart host
+	relayhost = mailhost.dkfz-heidelberg.de
+	smtp_sasl_auth_enable = yes
+	smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+	smtp_sasl_security_options = noanonymous
+
+#6.	As a little test that all is fine type in the termianl sudo postfix start, push return and type in date | mail -s test your-dkfz-mail@dkfz.de. A few seconds later should be a mail in you mail directory.
+
+#Now open the settings.py from the bookingCal
+#At the bottom from this file are the variables SENDER_MAIL and SMTP_SERVER
+#At SENDER_MAIL you must type in the mail address which sends the mails to any user 
+#Example:
+SENDER_MAIL="your.mail@mailprovider.de"
+#At SMTP_SERVER you must type in the server which sends the mails
+#Example: (in the dkfz are the Server: "mailhost.dkfz-heidelberg.de")
+SMTP_SERVER="mailhost.provider.de 
+#
+#
+
 
 
 #Main sources for this instruction:
