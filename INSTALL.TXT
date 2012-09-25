@@ -1,3 +1,15 @@
+#++++++++++++++++++++++DITECTORY+++++++++++++++++++++++
+#+++++INSTALL THE BOOKING SYSTEM ON A LINUX+++ROW  13++
+#+++++INSTALL THE BOOKING SYSTEM ON A MAC+++++ROW 123++
+
+#+++++++++++++++++++SOME LINKS+++++++++++++++++++++++++
+#Virtual Box Download: https://www.virtualbox.org/wiki/Downloads
+#Ubuntu Download: http://www.ubuntu.com/download/desktop
+#How to Install Ubuntu on a Virtual Box: https://www.virtualbox.org/manual/ch01.html#idp13614032
+
+#******************************************************
+#*****HOWTO INSTALL THE BOOKING SYSTEM ON A LINUX OS***
+#******************************************************
 #for a virtuabox test environment use:
 # install guest additions...before installing you have to get linux src code in order to work
 sudo apt-get install build-essential linux-headers-`uname -r`
@@ -105,6 +117,9 @@ sudo chmod 777 /var/www/django/info.log
 
 --
 =======================
+#******************************************************
+#*****HOWTO INSTALL THE BOOKING SYSTEM ON A MAC OS*****
+#******************************************************
 Howto make it run on mac os x lion eclipse and for developing it LOCALLY, you need
 install eclipse
 install subversion plugin for eclipse
@@ -164,8 +179,7 @@ SENDER_MAIL="your.mail@mailprovider.de"
 #At SMTP_SERVER you must type in the server which sends the mails
 #Example: (in the dkfz are the Server: "mailhost.dkfz-heidelberg.de")
 SMTP_SERVER="mailhost.provider.de 
-#
-#
+
 
 
 

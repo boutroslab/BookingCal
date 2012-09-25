@@ -41,23 +41,6 @@ mnames = "January February March April May June July August September October No
 mnames = mnames.split()
 _email = ""
 
-def x_intercept(m, b):
-    """
-    Return the x intercept of the line M{y=m*x+b}.  The X{x intercept}
-    of a line is the point at which it crosses the x axis (M{y=0}).
-
-    This function can be used in conjuction with 
-    find an arbitrary function's zeros.
-
-    @type  m: number
-    @param m: The slope of the line.
-    @type  b: number
-    @param b: The y intercept of the line.  The X{y intercept} of a
-              line is the point at which it crosses the y axis (M{x=0}).
-    @rtype:   number
-    @return:  the x intercept of the line M{y=m*x+b}.
-    """
-    return -b/m
 
 def reminders(request):
     """
@@ -498,11 +481,12 @@ def dbadd(request):
             anzahlEquip = request.POST['countEquip']
 #            get the equipments
 #            datumformation
-
+            #Date and Time values from the bookpage as strings 
             Entrydate1 = request.POST['date_0']
             Entrydate2 = request.POST['enddate_0']
             Entrytime1 = request.POST['date_1']
             Entrytime2 = request.POST['enddate_1']
+            #create RegEx 
             regex2 = re.compile("\A[0-2]\d:[0-5]\d$")
             regex = re.compile("\A[0-2]\d:[0-5]\d:[0-5]\d\Z$")
             is_guest = request.POST['forwho']
@@ -523,9 +507,11 @@ def dbadd(request):
 
             Eid = request.POST['equipment']
 	    EidList = Eid.split(",")
+        #after every "round" between the following code, is roundCount a comparable value with then large of list with all booked equipments 
 	    roundCount = 0
 	    errorlist = ""
 	    for Eid in EidList:
+        #after every round goes roundCount +1
 		roundCount += 1
                 myEquipList=[Eid]
                 if not anzahlEquip =="":
