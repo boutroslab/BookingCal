@@ -1,194 +1,1 @@
-#++++++++++++++++++++++DITECTORY+++++++++++++++++++++++
-#+++++INSTALL THE BOOKING SYSTEM ON A LINUX+++ROW  13++
-#+++++INSTALL THE BOOKING SYSTEM ON A MAC+++++ROW 123++
-
-#+++++++++++++++++++SOME LINKS+++++++++++++++++++++++++
-#Virtual Box Download: https://www.virtualbox.org/wiki/Downloads
-#Ubuntu Download: http://www.ubuntu.com/download/desktop
-#How to Install Ubuntu on a Virtual Box: https://www.virtualbox.org/manual/ch01.html#idp13614032
-
-#******************************************************
-#*****HOWTO INSTALL THE BOOKING SYSTEM ON A LINUX OS***
-#******************************************************
-#for a virtuabox test environment use:
-# install guest additions...before installing you have to get linux src code in order to work
-sudo apt-get install build-essential linux-headers-`uname -r`
-
-#install booking calendar on ubuntu hardy in a virtual box environment...
-#change hostname to b110-webserver (dont need this if you want to deploy on b110-websrv)
->sudo vi /etc/hostname
-#change hostname to b110-webserver (dont need this if want to deploy on b110-websrv)
-sudo vi /etc/hosts
-# update sys
-> sudo apt-get update
-> sudo apt-get upgrade
-#install setup tools and pip
-sudo apt-get install python-setuptools python-dev build-essential mysql-server python-mysqldb python-ldap
-sudo easy_install pip
-sudo pip install --upgrade virtualenv
-sudo pip install django
-sudo pip install python-ldap
-sudo pip install smtp
-sudo apt-get install apache2-threaded-dev 
-download  latest http://code.google.com/p/modwsgi/
-#e.g.
-wget http://modwsgi.googlecode.com/files/mod_wsgi-3.3.tar.gz
-tar xzf mod_wsgi-2.6.tar.gz
-cd mod_wsgi-3.3
-./configure --with-python=/usr/bin/python2.5
-make
-sudo make install
-sudo emacs /etc/apache2/mods-available/wsgi.load 
-#put in the following line in that file:
-LoadModule wsgi_module /usr/lib/apache2/modules/mod_wsgi.so
-#save and exit
->sudo a2enmod wsgi
->sudo mkdir -p /var/www
->cd /var/www
-mkdir django
-cd django
-mkdir django_projects
-mkdir django_templates
-mkdir media
-cd django_projects
-sudo django-admin.py startproject bookingCal
-#now create an empty wsgi booking cal project
-mkdir -p  bookingCal/apache
-sudo nano bookingCal/apache/django.wsgi
------
-import os
-import sys
- 
-path = '/var/www/django/django_projects'
-if path not in sys.path:
-    sys.path.insert(0, '/var/www/django/django_projects')
- 
-os.environ['DJANGO_SETTINGS_MODULE'] = 'bookingCal.settings'
- 
-import django.core.handlers.wsgi
-application = django.core.handlers.wsgi.WSGIHandler()
------
-
-sudo nano /etc/apache2/sites-available/bookingCal
-
-#please change server name e.g. on  b110-websrv use "<VirtualHost b110-websrv:80>"
------
-Listen 8080
-NameVirtualHost *:8080
-<VirtualHost *:8080>
-
-    ServerName b110-websrv
-    DocumentRoot /var/www/django/django_projects/bookingCal
-
-    <Directory /var/www/django/django_projects/bookingCal>
-        Order allow,deny
-        Allow from all
-    </Directory>
-
-    WSGIDaemonProcess b110-websrv processes=2 threads=15 display-name=%{GROUP}
-    WSGIProcessGroup b110-websrv
-
-    WSGIScriptAlias / /var/www/django/django_projects/bookingCal/apache/django.wsgi
-
-</VirtualHost>
-
-
------
-sudo a2ensite bookingCal
-sudo /etc/init.d/apache2 reload
-cd /var/www/django/django_projects/bookingCal
-python manage.py runserver 0:8080
-#test in webbrowser: http://0:8080  or http://b110-websrv:8080
-ctrl+c django server
-#in /var/www/django/django_projects/bookingCal make a backup of all old files, do a :
-for FILE in *.py; do mv $FILE $FILE.old; done
-
-#now copy bookingcal stuff, go to temp or root dir
-cd 
-svn checkout http://b110-devserver/svn/bookingCalPhyton
-cd bookingCalPython
-sudo cp *.py /var/www/django/django_projects/bookingCal
-sudo cp -r ecalendar static templates /var/www/django/django_projects/bookingCal   
-sudo touch /var/www/django/info.log
-sudo chmod 777 /var/www/django/info.log
-# i dont know yet if this is necessary : django-admin.py syncdb
-#maybe now you need to copy over the websrv db etc.
-
-
---
-=======================
-#******************************************************
-#*****HOWTO INSTALL THE BOOKING SYSTEM ON A MAC OS*****
-#******************************************************
-Howto make it run on mac os x lion eclipse and for developing it LOCALLY, you need
-install eclipse
-install subversion plugin for eclipse
-install pydev plugin for eclipse
-
-easy_install pip 
-install pip
-install django using pip: "pip install django"
-install mysql support for python: "sudo pip install MySQL-python"
-install epydoc using pip:  "pip install epydoc"
-install python ldap module for Mac Os X Lion: "sudo pip install python-ldap==2.3.13"
-??somehow install postfix on mac os x lion to work with smtplib??  dont know yet
-
-check out booking cal via svn in eclipse using svn plugin and set it as a pydev->django project
-go to eclipse->preferences->pydev->interpreter python->open Libraries tab, click "Auto config", mark everything, click "Apply"
-go to eclipse->preferences->pydev->interpreter python->open environment tab, enter as variable "DYLD_LIBRARY_PATH" and as value "/usr/local/mysql/lib"
-
-
-generate sourcecode documenation using epydoc the following way, epydoc needs the location of all the modules of your project and 
-the django settings file, so setup following environment variables:
-
-export PYTHONPATH=/Volumes/Mac_HDD_2/Users/oliverpelz/Documents/workspace/bookingCalPyProject:$PYTHONPATH
-export DJANGO_SETTINGS_MODULE=bookingCalPython.settings
-e.g. cd bookingCalPyProject/ecalendar
-#first check if running will work successfully:
-epydoc -v --check views.py
-
-#then run it for real and generate it in output dir e.g. ecalendar_docs:
-epydoc -v --html views.py -o ecalendar_docs
-
-#general information on how to document your subroutines and classes etc: http://epydoc.sourceforge.net/epydoc.html#a-brief-introduction
-
-#Setting up the mailserver functionality under Lion:
-
-#1.	Create in the directory  /etc/postfix/ a file which called sasl_passwd. (sudo vi sasl_passed)
-#2.	Open this file and add mailhost.dkfz-heidelberg.de AD-Name:AD-Passwort
-#3.	After that  save an close this file
-#4.	Than type in the terminal postmap /etc/postfix/sasl_passwd
-#5.	After that add the following lines to /etc/postfix/main.cf
-
-	myorigin = mailhost.dkfz-heidelberg.de
-	myhostname = mailer.$myorigin
-	smtpd_sender_restrictions = permit_inet_interfaces
-	# smart host
-	relayhost = mailhost.dkfz-heidelberg.de
-	smtp_sasl_auth_enable = yes
-	smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
-	smtp_sasl_security_options = noanonymous
-
-#6.	As a little test that all is fine type in the termianl sudo postfix start, push return and type in date | mail -s test your-dkfz-mail@dkfz.de. A few seconds later should be a mail in you mail directory.
-
-#Now open the settings.py from the bookingCal
-#At the bottom from this file are the variables SENDER_MAIL and SMTP_SERVER
-#At SENDER_MAIL you must type in the mail address which sends the mails to any user 
-#Example:
-SENDER_MAIL="your.mail@mailprovider.de"
-#At SMTP_SERVER you must type in the server which sends the mails
-#Example: (in the dkfz are the Server: "mailhost.dkfz-heidelberg.de")
-SMTP_SERVER="mailhost.provider.de 
-
-
-
-
-#Main sources for this instruction:
-#http://blog.stannard.net.au/2010/12/11/installing-django-with-apache-and-mod_wsgi-on-ubuntu-10-04/
-#http://grok.zope.org/documentation/tutorial/installing-and-setting-up-grok-under-mod-wsgi/installing-and-configuring-mod-wsgi
-#http://www.saltycrane.com/blog/2010/02/how-install-pip-ubuntu/
-
-#http://epydoc.sourceforge.net/epydoc.html
-
-# some forum threads and newsgroup entries
-
+#++++++++++++++++++++++DITECTORY+++++++++++++++++++++++#+++++INSTALL THE BOOKING SYSTEM ON A LINUX+++ROW  13++#+++++INSTALL THE BOOKING SYSTEM ON A MAC+++++ROW 123++#+++++++++++++++++++SOME LINKS+++++++++++++++++++++++++#Virtual Box Download: https://www.virtualbox.org/wiki/Downloads#Ubuntu Download: http://www.ubuntu.com/download/desktop#How to Install Ubuntu on a Virtual Box: https://www.virtualbox.org/manual/ch01.html#idp13614032#******************************************************#*****HOWTO INSTALL THE BOOKING SYSTEM ON A LINUX OS***#******************************************************#for a virtualbox test environment use:# install guest additions (this is confusing ╨ how do you do this?)...before installing you have to get linux src code in order to worksudo apt-get install build-essential linux-headers-`uname -r`need to install apache2!#install booking calendar on ubuntu hardy in a virtual box environment...#change hostname to b110-websrv (dont need this if you want to deploy on b110-websrv)>sudo vi /etc/hostname#change hostname to b110-websrv (dont need this if you want to deploy on b110-websrv)sudo vi /etc/hosts# update sys> sudo apt-get update> sudo apt-get upgrade#install setup tools and pipsudo apt-get install python-setuptools python-dev build-essential mysql-server python-mysqldb python-ldapsudo easy_install pipsudo pip install --upgrade virtualenvsudo pip install djangosudo pip install python-ldapsudo pip install smtpsudo apt-get install apache2-threaded-dev problem: ended up in read-only directory, need to go back to home directory/other directory?download  latest http://code.google.com/p/modwsgi#e.g.wget http://modwsgi.googlecode.com/files/mod_wsgi-3.3.tar.gztar xzf mod_wsgi-3.3.tar.gzcd mod_wsgi-3.3#check python version (mine was 2.7) before running next command (python --version)./configure --with-python=/usr/bin/python2.7makesudo make installsudo emacs /etc/apache2/mods-available/wsgi.load #put in the following line in that file:LoadModule wsgi_module /usr/lib/apache2/modules/mod_wsgi.so#save and exit>sudo a2enmod wsgi>sudo mkdir -p /var/wwwcd /var/wwwsudo django-admin.py startproject bookingCal#now create an empty wsgi booking cal projectsudo mkdir -p  bookingCal/apachesudo nano bookingCal/apache/django.wsgi-----import osimport sys path = '/var/www/bookingCal'if path not in sys.path:    sys.path.insert(0, '/var/www/bookingCal') os.environ['DJANGO_SETTINGS_MODULE'] = 'bookingCalPython.settings' import django.core.handlers.wsgiapplication = django.core.handlers.wsgi.WSGIHandler()-----sudo nano /etc/apache2/sites-available/bookingCal -----Listen 80NameVirtualHost *:80<VirtualHost *:80>    ServerName b110-websrv    DocumentRoot /var/www/bookingCal    <Directory /var/www/bookingCal>        Order allow,deny        Allow from all    </Directory>    WSGIDaemonProcess b110-websrv processes=2 threads=15 display-name=%{GROUP}    WSGIProcessGroup b110-websrv    WSGIScriptAlias / /var/www/bookingCal/apache/django.wsgi</VirtualHost>-----sudo a2ensite bookingCalsudo /etc/init.d/apache2 reloadcd /var/www/bookingCal#check if the empty django project work….python manage.py runserver 0:8080#test in webbrowser: http://0:8080  or http://b110-websrv:8080 or http://localhost:8080ctrl+c django server to end it sudo svn checkout http://b110-devserver/svn/bookingCalPython /var/www/bookingCal  --forcesudo touch /var/www/bookingCal/info.logsudo chmod 777 /var/www/bookingCal/info.log# i dont know yet if this is necessary : django-admin.py syncdb#maybe now you need to copy over the websrv db etc.--=======================#******************************************************#*****HOWTO INSTALL THE BOOKING SYSTEM ON A MAC OS*****#******************************************************Howto make it run on mac os x lion eclipse and for developing it LOCALLY, you needinstall eclipseinstall subversion plugin for eclipseinstall pydev plugin for eclipseeasy_install pip install pipinstall django using pip: "pip install django"install mysql support for python: "sudo pip install MySQL-python"install epydoc using pip:  "pip install epydoc"install python ldap module for Mac Os X Lion: "sudo pip install python-ldap==2.3.13"??somehow install postfix on mac os x lion to work with smtplib??  dont know yetcheck out booking cal via svn in eclipse using svn plugin and set it as a pydev->django projectgo to eclipse->preferences->pydev->interpreter python->open Libraries tab, click "Auto config", mark everything, click "Apply"go to eclipse->preferences->pydev->interpreter python->open environment tab, enter as variable "DYLD_LIBRARY_PATH" and as value "/usr/local/mysql/lib"generate sourcecode documenation using epydoc the following way, epydoc needs the location of all the modules of your project and the django settings file, so setup following environment variables:export PYTHONPATH=/Volumes/Mac_HDD_2/Users/oliverpelz/Documents/workspace/bookingCalPyProject:$PYTHONPATHexport DJANGO_SETTINGS_MODULE=bookingCalPython.settingse.g. cd bookingCalPyProject/ecalendar#first check if running will work successfully:epydoc -v --check views.py#then run it for real and generate it in output dir e.g. ecalendar_docs:epydoc -v --html views.py -o ecalendar_docs#general information on how to document your subroutines and classes etc: http://epydoc.sourceforge.net/epydoc.html#a-brief-introduction#Setting up the mailserver functionality under Lion:#1.	Create in the directory  /etc/postfix/ a file which called sasl_passwd. (sudo vi sasl_passed)#2.	Open this file and add mailhost.dkfz-heidelberg.de AD-Name:AD-Passwort#3.	After that  save an close this file#4.	Than type in the terminal postmap /etc/postfix/sasl_passwd#5.	After that add the following lines to /etc/postfix/main.cf	myorigin = mailhost.dkfz-heidelberg.de	myhostname = mailer.$myorigin	smtpd_sender_restrictions = permit_inet_interfaces	# smart host	relayhost = mailhost.dkfz-heidelberg.de	smtp_sasl_auth_enable = yes	smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd	smtp_sasl_security_options = noanonymous#6.	As a little test that all is fine type in the termianl sudo postfix start, push return and type in date | mail -s test your-dkfz-mail@dkfz.de. A few seconds later should be a mail in you mail directory.#Now open the settings.py from the bookingCal#At the bottom from this file are the variables SENDER_MAIL and SMTP_SERVER#At SENDER_MAIL you must type in the mail address which sends the mails to any user #Example:SENDER_MAIL="your.mail@mailprovider.de"#At SMTP_SERVER you must type in the server which sends the mails#Example: (in the dkfz are the Server: "mailhost.dkfz-heidelberg.de")SMTP_SERVER="mailhost.provider.de #Main sources for this instruction:#http://blog.stannard.net.au/2010/12/11/installing-django-with-apache-and-mod_wsgi-on-ubuntu-10-04/#http://grok.zope.org/documentation/tutorial/installing-and-setting-up-grok-under-mod-wsgi/installing-and-configuring-mod-wsgi#http://www.saltycrane.com/blog/2010/02/how-install-pip-ubuntu/#http://epydoc.sourceforge.net/epydoc.html# some forum threads and newsgroup entries
