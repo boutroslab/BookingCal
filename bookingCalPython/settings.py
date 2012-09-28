@@ -1,3 +1,4 @@
+from django.conf import settings
 ## Django settings for bookingCal project.
 import os
 import sys
@@ -25,10 +26,10 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'buchung_django', # Or path to database file if using sqlite3.
+        'NAME': 'booking_django', # Or path to database file if using sqlite3.
         'USER': 'django', # Not used with sqlite3.
         'PASSWORD': '!dj4n6o', # Not used with sqlite3.
-        'HOST': 'b110-dbserve', # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': '', # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '', # Set to empty string for default. Not used with sqlite3.
     }
 }
